@@ -1,0 +1,1 @@
+"""Datamodel for strukturerede logrecords."""
