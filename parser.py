@@ -26,7 +26,7 @@ def sepperation(lines):
         dest = section5.split("=")
         dest = dest[1]
         port = section6.split("=")
-        port = port[1]
+        port = int(port[1])
         status = section7.split("=")
         status = status[1]
         timestamp = line_split_initial[0]
