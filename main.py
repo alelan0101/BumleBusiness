@@ -1,10 +1,10 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
+import parser
 from config import APP_NAME, APP_VERSION, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
-import parser
 
 
 def parse_args(argv: list[str] | None = None) -> Namespace:
@@ -23,13 +23,16 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         lines = load_log_file(args.log_file)
-        parser.sepperation(lines)
+        records, skipped_lines = parser.log_line_parser(lines)
     except BumleBusinessError as error:
         print(f"Fejl: {error}")
         return 1
 
     print(f"{APP_NAME} {APP_VERSION}")
-    print(f"Indlæste {len(lines)} linjer fra {args.log_file}")
+    print(f"Indlæste {len(records)} linjer fra {args.log_file}")
+
+    if skipped_lines:
+        print(f"Sprang {len(skipped_lines)} ugyldige linjer over")
     return 0
 
 
