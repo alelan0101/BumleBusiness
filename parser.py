@@ -1,41 +1,43 @@
 """Parsning af rå loglinjer til strukturerede logrecords."""
 
 
-import datetime
-from time import strptime
+from datetime import datetime
 
-import log_creation as log_creation
+from model import LogRecord
 
 
-def sepperation(lines):
+def log_line_parser(lines) -> tuple[list[LogRecord], list[str]]:
     list_of_logs = []
-    for i in range(len(lines)):
-        line_split_initial = lines[i].split(" ")
-        section1 = str(line_split_initial[1])
-        section2 = str(line_split_initial[2])
-        section3 = str(line_split_initial[3])
-        section4 = str(line_split_initial[4])
-        section5 = str(line_split_initial[5])
-        section6 = str(line_split_initial[6])
-        section7 = str(line_split_initial[7])
-        event = section2.split("=")
-        event = event[1]
-        user = section3.split("=")
-        user = user[1]
-        level = section1.split("=")
-        level = level[1]
-        src = section4.split("=")
-        src = src[1]
-        dest = section5.split("=")
-        dest = dest[1]
-        port = section6.split("=")
-        port = int(port[1])
-        status = section7.split("=")
-        status = status[1]
-        timestamp = line_split_initial[0]
-        msg = lines[0].split("=")
-        msg = msg[-1]
-        timestamp=strptime(timestamp, "%Y-%m-%dT%H:%M:%S")
-        name = f"{timestamp}.{user}.{event}.{status}"
-        list_of_logs.append(log_creation.Memory(event, user, level, src, dest, port, status, timestamp, msg, name))
-    return list_of_logs
+    skipped_lines = []
+    for line in lines:
+        try:
+            (
+                timestamp,
+                level,
+                event,
+                user,
+                src_ip,
+                dest_host,
+                dest_port,
+                status,
+                *_,
+            ) = line.split(" ")
+            msg = line.split("msg=", 1)[1]
+            if msg.startswith('"') and msg.endswith('"'):
+                msg = msg[1:-1]
+            list_of_logs.append(
+                LogRecord(
+                    timestamp=datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S"),
+                    level=level.split("=")[1],
+                    event=event.split("=")[1],
+                    user=user.split("=")[1],
+                    src_ip=src_ip.split("=")[1],
+                    dest_host=dest_host.split("=")[1],
+                    dest_port=int(dest_port.split("=")[1]),
+                    status=status.split("=")[1],
+                    msg=msg,
+                )
+            )
+        except (IndexError, ValueError):
+            skipped_lines.append(line)
+    return list_of_logs, skipped_lines
