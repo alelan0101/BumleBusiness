@@ -1,6 +1,9 @@
 """Parsning af rå loglinjer til strukturerede logrecords."""
 
 
+import datetime
+from time import strptime
+
 import log_creation as log_creation
 
 
@@ -32,6 +35,7 @@ def sepperation(lines):
         timestamp = line_split_initial[0]
         msg = lines[0].split("=")
         msg = msg[-1]
+        timestamp=strptime(timestamp, "%Y-%m-%dT%H:%M:%S")
         name = f"{timestamp}.{user}.{event}.{status}"
         list_of_logs.append(log_creation.Memory(event, user, level, src, dest, port, status, timestamp, msg, name))
     return list_of_logs
