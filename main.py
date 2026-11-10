@@ -4,6 +4,7 @@ from pathlib import Path
 from config import APP_NAME, APP_VERSION, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
+import parser
 
 
 def parse_args(argv: list[str] | None = None) -> Namespace:
@@ -22,6 +23,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         lines = load_log_file(args.log_file)
+        parser.sepperation(lines)
     except BumleBusinessError as error:
         print(f"Fejl: {error}")
         return 1
