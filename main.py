@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
-import parser, stats, filterForHighest
+import parser, stats, filterForHighest, conversionOfNumbers
 from config import APP_NAME, APP_VERSION, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
@@ -25,7 +25,9 @@ def main(argv: list[str] | None = None) -> int:
         lines = load_log_file(args.log_file)
         records, skipped_lines = parser.log_line_parser(lines)
         AllData, LoginProcent = stats.filtering(records)
-        filterForHighest.highestTabel(AllData,records)
+        ManyLists = filterForHighest.highestTabel(AllData,records)
+        #This thing lets you filter the stuff, you can copy paste it and change in the [] area to change what you filter for
+        converted = conversionOfNumbers.convert_from_Unholy_List(ManyLists, ["User","LOGIN_FAILED"])
     except BumleBusinessError as error:
         print(f"Fejl: {error}")
         return 1

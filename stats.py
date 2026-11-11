@@ -1,5 +1,6 @@
 
 def filtering(records):
+    #Alle disse bruges til forskellige former for record keeping
     everyUser = []
     everyLevel = []
     everyEvent = []
@@ -22,6 +23,7 @@ def filtering(records):
     everyLevel.sort()
     everyEvent.sort()
     everyStatus.sort()
+    #her går vi igennem alle records og tæller hvor mange gange hver user, level, event og status forekommer. Dette gemmes i en dictionary som til sidst returneres
     for x in range(len(everyUser)):
         Instance = 0
         for z in range(len(records)):
@@ -46,6 +48,7 @@ def filtering(records):
             if records[z].status == everyStatus[x]:
                 Instance = Instance +1
         StatusDict[everyStatus[x]] = Instance
+    #Sammel alle dicts med data i en liste som returneres sammen med procentdelen af login failures
     everyDict.append(UserDict)   
     everyDict.append(LevelDict) 
     everyDict.append(EventDict)

@@ -1,5 +1,6 @@
 def highestTabel(AllData,records):
     import highestUse
+    #Her laves en liste til at kunne track, hvor mange af hvert forskellig key der findes
     listOfKeysUsers = []
     listOfKeysEvents = []
     listOfKeysStauts = []
@@ -20,6 +21,7 @@ def highestTabel(AllData,records):
                 if key in records[z].level:
                     if not key in listOfKeysLevel:
                         listOfKeysLevel.append(key)
+    #Loop herunder bruges til at indsamle alle data i en dictionary som til sidst bliver tilføjet til en liste. Listen bliver returneret og kan bruges til at finde den user med flest login failures
     for i in range(len(listOfKeysUsers)):
         NewDict = {}
         NewDict["User"] = listOfKeysUsers[i]
@@ -30,6 +32,10 @@ def highestTabel(AllData,records):
                         NewDict[listOfKeysEvents[z]] = 1
                     else:
                         NewDict[listOfKeysEvents[z]] += 1
+                    if not "Events" in NewDict:
+                        NewDict["Events"] = 1
+                    else:   
+                        NewDict["Events"] += 1
         for z in range(len(listOfKeysStauts)):
             for x in range(len(records)):
                 if listOfKeysUsers[i] in records[x].user and listOfKeysStauts[z] in records[x].status:
@@ -37,6 +43,10 @@ def highestTabel(AllData,records):
                         NewDict[listOfKeysStauts[z]] = 1
                     else:
                         NewDict[listOfKeysStauts[z]] += 1
+                    if not "Status" in NewDict:
+                        NewDict["Status"] = 1
+                    else:   
+                        NewDict["Status"] += 1
         for z in range(len(listOfKeysLevel)):
             for x in range(len(records)):
                 if listOfKeysUsers[i] in records[x].user and listOfKeysLevel[z] in records[x].level:
@@ -44,9 +54,13 @@ def highestTabel(AllData,records):
                         NewDict[listOfKeysLevel[z]] = 1
                     else:
                         NewDict[listOfKeysLevel[z]] += 1
+                    if not "Level" in NewDict:
+                        NewDict["Level"] = 1
+                    else:   
+                        NewDict["Level"] += 1
         UnholyList.append(NewDict)
 
-    print(highestUse.getHighestUser(UnholyList))
+    return UnholyList
 
     
     #UnholyList.sort(key=lambda x: x.get("LOGIN_FAILED", 0), reverse=True)
