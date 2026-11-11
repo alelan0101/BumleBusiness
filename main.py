@@ -3,7 +3,10 @@ import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
+import conversionOfNumbers
+import filterForHighest
 import parser
+import stats
 from config import APP_NAME, APP_VERSION, BASE_DIR, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
@@ -48,6 +51,10 @@ def main(argv: list[str] | None = None) -> int:
     try:
         lines = load_log_file(args.log_file)
         records, skipped_lines = parser.log_line_parser(lines)
+        AllData, LoginProcent = stats.filtering(records)
+        Compiled_Data = filterForHighest.highestTabel(AllData,records)
+        #This thing lets you filter the stuff, you can copy paste it and change in the [] area to change what you filter for
+        converted = conversionOfNumbers.convert_from_Complied_Data(Compiled_Data, ["User","LOGIN_FAILED"])
     except BumleBusinessError as error:
         print(f"Fejl: {error}")
         return 1
