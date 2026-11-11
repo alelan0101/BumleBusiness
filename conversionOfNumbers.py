@@ -1,4 +1,4 @@
-def convert_from_Unholy_List(UnholyList,Keys):
+def convert_from_Complied_Data(UnholyList,Keys):
     #Speedrunning a filtering system
     SearchList = []
     for i in range(len(UnholyList)):

@@ -5,7 +5,7 @@ def highestTabel(AllData,records):
     listOfKeysEvents = []
     listOfKeysStauts = []
     listOfKeysLevel = []
-    UnholyList = []
+    Complied_Data = []
     for i in range(len(AllData)):
         for key in AllData[i]:
             for z in range(len(records)):
@@ -58,9 +58,9 @@ def highestTabel(AllData,records):
                         NewDict["Level"] = 1
                     else:   
                         NewDict["Level"] += 1
-        UnholyList.append(NewDict)
+        Complied_Data.append(NewDict)
 
-    return UnholyList
+    return Complied_Data
 
     
     #UnholyList.sort(key=lambda x: x.get("LOGIN_FAILED", 0), reverse=True)
