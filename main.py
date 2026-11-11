@@ -1,7 +1,7 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
-import parser
+import parser, stats, filterForHighest
 from config import APP_NAME, APP_VERSION, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
@@ -24,6 +24,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         lines = load_log_file(args.log_file)
         records, skipped_lines = parser.log_line_parser(lines)
+        AllData, LoginProcent = stats.filtering(records)
+        filterForHighest.highestTabel(AllData,records)
     except BumleBusinessError as error:
         print(f"Fejl: {error}")
         return 1
