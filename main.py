@@ -50,6 +50,17 @@ def parse_args(argv: list[str] | None = None) -> Namespace:
         action="store_true",
         help="Vis coverage sammen med --run-tests",
     )
+    parser.add_argument(
+        "--dashboard",
+        action="store_true",
+        help="Start dashboardet med tabelvisningen efter kørsel",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=dashboard.DEFAULT_PORT,
+        help="Port til dashboardet",
+    )
     return parser.parse_args(argv)
 
 
@@ -97,7 +108,8 @@ def main(argv: list[str] | None = None) -> int:
     if skipped_lines:
         print(f"Sprang {len(skipped_lines)} ugyldige linjer over")
 
-    dashboard.run(records)
+    if args.dashboard:
+        dashboard.run(records, args.port)
     return 0
 
 
