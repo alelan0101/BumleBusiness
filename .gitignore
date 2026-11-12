@@ -1,4 +1,5 @@
 /__pycache__/
+**.txt
 .pytest_cache/
 .coverage
 htmlcov/
