@@ -10,6 +10,7 @@ import filterForHighest
 import high_filter_helper
 import parser
 import stats
+import suspicious_account_tracker
 import user_ip_helper
 from config import APP_NAME, APP_VERSION, BASE_DIR, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
@@ -94,10 +95,8 @@ def main(argv: list[str] | None = None) -> int:
         print('=' * width)
         Summary = user_ip_helper.get_user_ip_summary(records)
         SummaryTable = user_ip_helper.format_user_ip_table(Summary)
-        print(f"General procent fejl: {LoginProcent} som decimaltal")
-        print(f"User Count: {Summary.get("user_count")}")
-        print(f"IP Count: {Summary.get("unique_ip_count")}")
-        print(SummaryTable)
+        Malware = suspicious_account_tracker.track_suspicious_accounts(records)
+        print(Malware)
     except BumleBusinessError as error:
         print(f"Fejl: {error}")
         return 1
