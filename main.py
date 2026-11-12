@@ -1,21 +1,21 @@
-import os
+import shutil
 import subprocess
 import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
 import conversionOfNumbers
+import dashboard
 import filterForHighest
 import high_filter_helper
 import parser
 import stats
-import table
 import user_ip_helper
 from config import APP_NAME, APP_VERSION, BASE_DIR, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
 
-width = os.get_terminal_size().columns
+width = shutil.get_terminal_size().columns
 def general_terminal_table(Compiled_Data):
     print("General Observations for regular useful user data")
     print("_" * width)
@@ -75,7 +75,6 @@ def main(argv: list[str] | None = None) -> int:
         converted = conversionOfNumbers.convert_from_Complied_Data(
             Compiled_Data, ["User", "LOGIN_FAILED"]
         )
-        table.create_table(records)
         # This thing prints the general info table
         general_terminal_table(Compiled_Data)
         print('=' * width)
@@ -97,6 +96,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if skipped_lines:
         print(f"Sprang {len(skipped_lines)} ugyldige linjer over")
+
+    dashboard.run(records)
     return 0
 
 

@@ -1,7 +1,18 @@
-import plotly.graph_objects as go
-import plotly.io as pio
+""" Byg Plotly table """
 
-pio.renderers.default = "browser"
+import plotly.graph_objects as go
+
+from config import COLUMN_WIDTHS
+
+ELLIPSIS = "…"
+MSG_LIMIT = 40
+NEUTRAL_CELL_COLOR = "#ffffff"
+NO_RESULTS_MESSAGE = "Ingen resultater matcher filtrene"
+
+ROW_HEIGHT = 30
+HEADER_HEIGHT = 30
+EMPTY_TABLE_HEIGHT = 200
+MARGIN = {"l": 20, "r": 20, "t": 20, "b": 20}
 
 COLUMN_LABELS = {
     "timestamp": "Tid",
@@ -29,41 +40,70 @@ COLUMN_VALUES = {
 
 DEFAULT_COLUMNS = tuple(COLUMN_LABELS)
 
+COLORED_COLUMNS = ("level", "status")
 
-def render_table(records, columns=DEFAULT_COLUMNS) -> str:
-    headers = [COLUMN_LABELS[column] for column in columns]
-    rows = [[COLUMN_VALUES[column](record) for column in columns] for record in records]
-
-    widths = []
-    for index, header in enumerate(headers):
-        cells = [row[index] for row in rows]
-        widths.append(max([len(header), *(len(cell) for cell in cells)]))
-
-    def format_row(values):
-        cells = (value.ljust(width) for value, width in zip(values, widths))
-        return "  ".join(cells).rstrip()
-
-    lines = [format_row(headers), "  ".join("-" * width for width in widths)]
-    lines.extend(format_row(row) for row in rows)
-    return "\n".join(lines)
+CELL_COLORS = {
+    "INFO": "#c8e6c9",
+    "WARN": "#ffe0b2",
+    "ALERT": "#ffcdd2",
+    "OK": "#c8e6c9",
+    "FAILED": "#ffcdd2",
+    "BLOCKED": "#ffcdd2",
+}
 
 
-def create_table(records):
-    cells = [
-        [COLUMN_VALUES[column](record) for record in records] for column in DEFAULT_COLUMNS
+def format_cell(record, column) -> str:
+    value = COLUMN_VALUES[column](record)
+    if column == "msg" and len(value) > MSG_LIMIT:
+        return value[:MSG_LIMIT] + ELLIPSIS
+    return value
+
+
+def cell_fill(records, column):
+    if column not in COLORED_COLUMNS:
+        return NEUTRAL_CELL_COLOR
+    return [
+        CELL_COLORS.get(format_cell(record, column), NEUTRAL_CELL_COLOR)
+        for record in records
     ]
 
-    fig = go.Figure(
+
+def build_table(records, columns=DEFAULT_COLUMNS):
+    cells = [
+        [format_cell(record, column) for record in records]
+        for column in columns
+    ]
+    fills = [cell_fill(records, column) for column in columns]
+
+    figure = go.Figure(
         data=[
             go.Table(
-                columnwidth=[1.4, 2.5, 1.0, 0.8, 1.1, 0.8, 0.7, 0.9, 2.5],
+                columnwidth=[COLUMN_WIDTHS[column] for column in columns],
                 header={
-                    "values": [COLUMN_LABELS[column] for column in DEFAULT_COLUMNS],
+                    "values": [COLUMN_LABELS[column] for column in columns],
                     "align": "left",
+                    "fill": {"color": "#e0e0e0"},
                 },
-                cells={"values": cells, "align": "left"},
+                cells={
+                    "values": cells,
+                    "align": "left",
+                    "fill": {"color": fills},
+                },
             )
         ]
     )
+    height = HEADER_HEIGHT + ROW_HEIGHT * len(records)
+    height += MARGIN["t"] + MARGIN["b"]
+    figure.update_layout(margin=MARGIN, height=height)
+    return figure
 
-    fig.show()
+
+def build_empty_table(columns=DEFAULT_COLUMNS):
+    figure = build_table([], columns)
+    figure.add_annotation(
+        text=NO_RESULTS_MESSAGE,
+        showarrow=False,
+        font={"size": 16},
+    )
+    figure.update_layout(height=EMPTY_TABLE_HEIGHT)
+    return figure
