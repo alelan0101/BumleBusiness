@@ -32,3 +32,9 @@ COLUMN_WIDTHS = {
     "status": 7,
     "msg": 40,
 }
+
+SUS_DETECTION = {
+    "ALERT": 4,
+    "MALWARE_DETECTION_MATCH": 2,
+    
+}
