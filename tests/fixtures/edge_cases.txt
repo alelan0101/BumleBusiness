@@ -1,0 +1,6 @@
+2026-03-02T09:15:00 level=INFO event=VPN_CONNECT user=ida src_ip=172.16.0.1 dest_host=vpn01 dest_port=443 status=OK msg=""
+2026-03-02T09:20:00 level=WARN event=CONFIG_CHANGE user=omar src_ip=192.168.1.20 dest_host=fw01 dest_port=22 status=OK msg="Changed rule "deny-all" on fw01"
+2026-03-02T09:25:00 level=INFO event=VPN_CONNECT user=ida src_ip=10.0.0.9 dest_port=443 status=OK msg="Missing host field"
+2026-03-02T09:30:00 level=INFO event=VPN_CONNECT user=ida src_ip=10.0.0.9 dest_host=vpn01 dest_port=HTTPS status=OK msg="Invalid port value"
+2026-03-02T09:35:00 level=INFO event=VPN_CONNECT user=ida src_ip=10.0.0.9 dest_host=vpn01 dest_port=443 status=OK
+2026-13-45T99:99:99 level=INFO event=VPN_CONNECT user=ida src_ip=10.0.0.9 dest_host=vpn01 dest_port=443 status=OK msg="Invalid timestamp"

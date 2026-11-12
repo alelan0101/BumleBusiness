@@ -1,14 +1,20 @@
+import os
+import subprocess
+import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
-import parser, stats, filterForHighest, conversionOfNumbers, high_filter_helper, user_ip_helper
-from config import APP_NAME, APP_VERSION, DEFAULT_LOG_PATH
+import conversionOfNumbers
+import filterForHighest
+import high_filter_helper
+import parser
+import stats
+import user_ip_helper
+from config import APP_NAME, APP_VERSION, BASE_DIR, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
 
-import os
-
-width = os.get_terminal_size().columns 
+width = os.get_terminal_size().columns
 def general_terminal_table(Compiled_Data):
     print("General Observations for regular useful user data")
     print("_" * width)
@@ -21,6 +27,10 @@ def port_watch(Compiled_Data):
     print("_" * width)
     high_filter_helper.Sort_And_Table(Compiled_Data, filter_keys)
 
+
+TEST_DIR = BASE_DIR / "tests"
+
+
 def parse_args(argv: list[str] | None = None) -> Namespace:
     parser = ArgumentParser(description=f"{APP_NAME} - VPN-logovervågning")
     parser.add_argument(
@@ -29,11 +39,31 @@ def parse_args(argv: list[str] | None = None) -> Namespace:
         default=DEFAULT_LOG_PATH,
         help="Sti til logfilen der skal indlæses",
     )
+    parser.add_argument(
+        "--run-tests",
+        action="store_true",
+        help="Kør testsuiten med pytest og afslut",
+    )
+    parser.add_argument(
+        "--coverage",
+        action="store_true",
+        help="Vis coverage sammen med --run-tests",
+    )
     return parser.parse_args(argv)
+
+
+def run_tests(coverage: bool = False) -> int:
+    command = [sys.executable, "-m", "pytest", str(TEST_DIR)]
+    if coverage:
+        command += ["--cov=parser", "--cov=model", "--cov=loader", "--cov-report=term-missing"]
+    return subprocess.run(command, check=False).returncode
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+
+    if args.run_tests:
+        return run_tests(args.coverage)
 
     try:
         lines = load_log_file(args.log_file)

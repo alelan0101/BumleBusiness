@@ -32,8 +32,10 @@ FAILED_STATUSES = {"FAILED", "BLOCKED"}
 
 def classify_ip(address: str) -> str:
     octets = address.split(".")
-    if len(octets) != 4 or not all(octet.isdigit() for octet in octets):
-        return "ekstern"
+    if len(octets) != 4:
+        return "invalid"
+    if not all(octet.isdigit() and 0 <= int(octet) <= 255 for octet in octets):
+        return "invalid"
 
     first, second = int(octets[0]), int(octets[1])
     if first == 10:

@@ -1,2 +1,7 @@
 /__pycache__/
-/.txt/
+**.txt
+.pytest_cache/
+.coverage
+htmlcov/
+
+/tests/__pycache__/
