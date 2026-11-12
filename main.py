@@ -1,6 +1,6 @@
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
-
+import table
 import parser
 from config import APP_NAME, APP_VERSION, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
@@ -24,6 +24,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         lines = load_log_file(args.log_file)
         records, skipped_lines = parser.log_line_parser(lines)
+        table.create_table(records)
     except BumleBusinessError as error:
         print(f"Fejl: {error}")
         return 1
