@@ -1,0 +1,6 @@
+2026-03-01T08:01:17 level=INFO event=LOGIN_SUCCESS user=eve src_ip=10.0.0.5 dest_host=db01 dest_port=53 status=OK msg="User authenticated successfully"
+2026-03-01T08:02:29 level=INFO event=PASSWORD_RESET user=victor src_ip=192.168.1.15 dest_host=fw01 dest_port=22 status=OK msg="Password reset completed"
+2026-03-01T08:15:31 level=ALERT event=PORT_SCAN_DETECTED user=admin src_ip=203.0.113.7 dest_host=mail01 dest_port=3389 status=BLOCKED msg="Sequential port probing detected"
+2026-03-01T08:20:37 level=WARN event=FILE_ACCESS_DENIED user=bob src_ip=10.0.0.5 dest_host=mail01 dest_port=3389 status=FAILED msg="Access denied to protected file"
+2026-03-01T08:08:03 level=INFO event=VPN_CONNECT user=peggy src_ip=45.83.12.9 dest_host=dc01 dest_port=22 status=OK msg="VPN session established"
+2026-03-01T08:37:46 level=WARN event=LOGIN_FAILED user=david src_ip=45.83.12.9 dest_host=files01 dest_port=80 status=OK msg="Invalid credentials"
