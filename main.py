@@ -1,21 +1,22 @@
-import os
+import shutil
 import subprocess
 import sys
 from argparse import ArgumentParser, Namespace
 from pathlib import Path
 
 import conversionOfNumbers
+import dashboard
 import filterForHighest
 import high_filter_helper
 import parser
 import stats
+import suspicious_account_tracker
 import user_ip_helper
 from config import APP_NAME, APP_VERSION, BASE_DIR, DEFAULT_LOG_PATH
 from errors import BumleBusinessError
 from loader import load_log_file
-import suspicious_account_tracker
 
-width = os.get_terminal_size().columns
+width = shutil.get_terminal_size().columns
 def general_terminal_table(Compiled_Data):
     print("General Observations for regular useful user data")
     print("_" * width)
@@ -50,6 +51,17 @@ def parse_args(argv: list[str] | None = None) -> Namespace:
         action="store_true",
         help="Vis coverage sammen med --run-tests",
     )
+    parser.add_argument(
+        "--dashboard",
+        action="store_true",
+        help="Start dashboardet med tabelvisningen efter kørsel",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=dashboard.DEFAULT_PORT,
+        help="Port til dashboardet",
+    )
     return parser.parse_args(argv)
 
 
@@ -70,21 +82,19 @@ def main(argv: list[str] | None = None) -> int:
         lines = load_log_file(args.log_file)
         records, skipped_lines = parser.log_line_parser(lines)
         AllData, LoginProcent = stats.filtering(records)
-        Compiled_Data = filterForHighest.highestTabel(AllData,records)
-        #This thing lets you filter the stuff, you can copy paste it and change in the [] area to change what you filter for
-        converted = conversionOfNumbers.convert_from_Complied_Data(Compiled_Data, ["User"])
-        #This thing prints the general info table
-        #general_terminal_table(Compiled_Data)
-        #print('=' * width)
-        #This thing prints the malware/port watch table
-        #port_watch(Compiled_Data)
-        #print('=' * width)
+        Compiled_Data = filterForHighest.highestTabel(AllData, records)
+        # This thing lets you filter the stuff, you can copy paste it and change in the [] area to change what you filter for
+        converted = conversionOfNumbers.convert_from_Complied_Data(
+            Compiled_Data, ["User", "LOGIN_FAILED"]
+        )
+        # This thing prints the general info table
+        general_terminal_table(Compiled_Data)
+        print('=' * width)
+        # This thing prints the malware/port watch table
+        port_watch(Compiled_Data)
+        print('=' * width)
         Summary = user_ip_helper.get_user_ip_summary(records)
         SummaryTable = user_ip_helper.format_user_ip_table(Summary)
-        #print(f"General procent fejl: {LoginProcent} som decimaltal")
-        #print(f"User Count: {Summary.get("user_count")}")
-        #print(f"IP Count: {Summary.get("unique_ip_count")}")
-        #print(SummaryTable)
         Malware = suspicious_account_tracker.track_suspicious_accounts(records)
         print(Malware)
     except BumleBusinessError as error:
@@ -96,6 +106,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if skipped_lines:
         print(f"Sprang {len(skipped_lines)} ugyldige linjer over")
+
+    if args.dashboard:
+        dashboard.run(records, args.port)
     return 0
 
 
