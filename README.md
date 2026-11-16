@@ -4,6 +4,10 @@
 
 `analysis.py` beregner top-10 lister og de dataserier, som diagrammerne bygger på. Funktionerne returnerer lister og dictionaries og skriver ikke selv til konsollen, så de kan genbruges af både CLI, dashboard og plot. Top-10-listerne bygger på `grouped_counts.highestTabel` i `aggregation/`, som grupperer hændelserne pr. bruger, kilde-IP, destinationsvært og port. Konsoltabellerne bygges af `console/tables.py`.
 
+### Malware match
+Sikkerheds detection nuværende holder øje med MALWARE_SIGNATURE_MATCH og login failures. Hvis der er mange login failures, så en user authenication, og et password reset exempelvis, er det ret typisk eksempel på mistænkelig aktivitet, så programmet holder også øje med det. Disse bliver printed i terminal under tabellerne.
+
+
 Top-10-listerne, opsummeringen af hændelser pr. time, fejlandel pr. port og de tre diagrammer vises i dashboardet:
 
 ```bash
