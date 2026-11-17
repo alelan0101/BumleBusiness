@@ -2,6 +2,7 @@ import shutil
 import subprocess
 import sys
 from argparse import ArgumentParser, Namespace
+from collections import Counter
 from pathlib import Path
 
 import parser
@@ -78,8 +79,16 @@ def main(argv: list[str] | None = None) -> int:
     try:
         lines = load_log_file(args.log_file)
         records, skipped_lines = parser.log_line_parser(lines)
+        event_count = Counter(record.event for record in records)
+        labels = list(event_count.keys())
+        values = list(event_count.values())
+        print("Labels: ", labels)
+        print("Values: ", values)
         AllData, LoginProcent = counts.filtering(records)
+        Keys = AllData[2].keys()
+        print(Keys)
         Compiled_Data = grouped_counts.highestTabel(AllData, records)
+        print(records[100].event)
         # This thing lets you filter the stuff, you can copy paste it and change in the [] area to change what you filter for
         converted = row_values.convert_from_Complied_Data(
             Compiled_Data, ["User", "LOGIN_FAILED"]
