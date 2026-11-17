@@ -9,6 +9,7 @@ DEFAULT_LOG_PATH: Path = BASE_DIR / "cyber_security_log_sample.txt"
 
 LOG_ENCODING = "utf-8"
 
+# De felter hver loglinje indeholder, i samme rækkefølge som i filen
 LOG_COLUMNS = (
     "timestamp",
     "level",
@@ -21,6 +22,7 @@ LOG_COLUMNS = (
     "msg",
 )
 
+# Ønsket bredde (i tegn) på hver kolonne, når logtabellen tegnes i dashboardet
 COLUMN_WIDTHS = {
     "timestamp": 19,
     "level": 7,
@@ -33,8 +35,8 @@ COLUMN_WIDTHS = {
     "msg": 40,
 }
 
+# Regler for detektion af mistænkelige konti: event -> hvor mange gange eventet skal optræde for samme bruger, før brugeren flagges
 SUS_DETECTION = {
     "ALERT": 4,
     "MALWARE_SIGNATURE_MATCH": 2,
-    
 }

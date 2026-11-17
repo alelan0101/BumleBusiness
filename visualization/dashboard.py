@@ -9,13 +9,17 @@ from . import logview, scatter_plots, tables
 
 DEFAULT_PORT = 8050
 
+# CSS-grid til filtrene og til top-10-tabellerne, så de fordeler sig efter skærmbredden
 FILTER_GRID = "repeat(auto-fit, minmax(120px, 1fr))"
 TOP_N_GRID = "repeat(auto-fit, minmax(280px, 1fr))"
 
 
+# Bygger hele Dash-appen: fanerne, filtrene, tabellerne og diagrammerne.
+# Funktionen kaldes af run() nedenfor og returnerer den app der skal startes.
 def create_app(records) -> Dash:
     columns = list(tables.DEFAULT_COLUMNS)
 
+    # Der laves et dropdown-filter pr. attribut i FILTER_ATTRIBUTES. Hvert filter får et id som callbacken nederst i funktionen kan slå op i.
     filter_dropdowns = [
         html.Div(
             [
@@ -34,6 +38,7 @@ def create_app(records) -> Dash:
         for attribute in logview.FILTER_ATTRIBUTES
     ]
 
+    # Fritekstsøgning, der kun ser på besked-kolonnen
     msg_filter = html.Div(
         [
             html.Label(tables.COLUMN_LABELS["msg"]),
@@ -46,6 +51,7 @@ def create_app(records) -> Dash:
         ]
     )
 
+    # To dropdowns: hvilken kolonne der sorteres efter, og om det er stigende eller faldende
     sort_controls = [
         html.Div(
             [
@@ -80,9 +86,11 @@ def create_app(records) -> Dash:
         ),
     ]
 
+    # Figurerne bygges en gang her, så de ikke skal regnes ud hver gang dashboardet åbnes i browseren
     figure = logview.build_view(records)[0]
     charts = scatter_plots.build_figures(records)
 
+    # Fane 1: selve logtabellen med filtre og sortering
     table_tab = dcc.Tab(
         label="Logtabel",
         value="table",
@@ -101,6 +109,7 @@ def create_app(records) -> Dash:
         ],
     )
 
+    # Tallene til overbliksfanen: periode, fejlrate og unikke brugere/IP'er
     summary = user_ips.get_user_ip_summary(records)
     ips_per_user = summary["ips_per_user"]
     ip_counts = [str(count) for count in ips_per_user.values()]
@@ -117,6 +126,7 @@ def create_app(records) -> Dash:
         else "Ingen data"
     )
 
+    # Fane 2: nøgletal for hele loggen plus en tabel over IP'er pr. bruger
     overview_tab = dcc.Tab(
         label="Overblik",
         children=[
@@ -149,9 +159,10 @@ def create_app(records) -> Dash:
         ],
     )
 
+    # Teksten over det første diagram: gennemsnit pr. time og den time med flest/færrest events
     hourly = analysis.hourly_summary(records)
     hourly_text = (
-        f"Gennemsnit: {hourly['average']:.1f} hændelser pr. time. "
+        f"Gennemsnit: {hourly['average']:.1f} events pr. time. "
         f"Flest kl. {hourly['busiest_hour']:02d} "
         f"({hourly['busiest_count']}), færrest kl. "
         f"{hourly['quietest_hour']:02d} ({hourly['quietest_count']})."
@@ -159,6 +170,7 @@ def create_app(records) -> Dash:
         else "Ingen data at vise"
     )
 
+    # Fane 3-5: de tre diagrammer, hver i sin egen tab
     chart_tabs = [
         dcc.Tab(
             label="Tid på dagen",
@@ -172,12 +184,15 @@ def create_app(records) -> Dash:
             children=[dcc.Graph(figure=charts["user_failure_rate"])],
         ),
         dcc.Tab(
-            label="Port og hændelsestype",
+            label="Port og eventtype",
             children=[dcc.Graph(figure=charts["port_event"])],
         ),
     ]
 
+    # Tallene til fane 6: fejlandel pr. port, både for alle og for eksterne IP'er
     port_rows = analysis.port_failure_rows(records)
+
+    # Fane 6: fejlandel pr. port som tabel
     port_tab = dcc.Tab(
         label="Fejlandel pr. port",
         children=[
@@ -185,7 +200,7 @@ def create_app(records) -> Dash:
                 figure=tables.build_columns_table(
                     (
                         "Port",
-                        "Hændelser",
+                        "Events",
                         "Fejl",
                         "Andel",
                         "Eksterne",
@@ -212,7 +227,10 @@ def create_app(records) -> Dash:
         ],
     )
 
+    # Tallene til fane 7: de ti hyppigste brugere, kilde-IP'er og destinationer
     top_lists = analysis.top_n_lists(records)
+
+    # Fane 7: top 10 som tre små tabeller ved siden af hinanden
     top_tab = dcc.Tab(
         label="Top 10",
         children=[
@@ -237,6 +255,7 @@ def create_app(records) -> Dash:
         ],
     )
 
+    # App-objektet. layout er det der tegnes i browseren: en overskrift og en samling tabs.
     app = Dash(__name__, title="Bumle Business – logdata")
     app.layout = html.Div(
         [
@@ -254,6 +273,7 @@ def create_app(records) -> Dash:
         style={"fontFamily": "sans-serif", "margin": "24px"},
     )
 
+    # Callbacken kaldes automatisk, hver gang en af Input-komponenterne ændrer sig, fx når brugeren vælger et filter. Den bygger tabellen på ny og returnerer både figuren og teksten med antal rækker.
     @app.callback(
         Output("log-table", "figure"),
         Output("row-count", "children"),
@@ -267,8 +287,7 @@ def create_app(records) -> Dash:
         Input("sort-column", "value"),
         Input("sort-direction", "value"),
     )
-    def update_view(event, user, level, dest_host, dest_port, status, msg,
-                    column, direction):
+    def update_view(event, user, level, dest_host, dest_port, status, msg, column, direction):
         figure, row_count = logview.build_view(
             records, event, user, level, dest_host, dest_port, status, msg,
             column, direction == "desc",
@@ -278,5 +297,6 @@ def create_app(records) -> Dash:
     return app
 
 
+# Starter dashboardet som en lokal webapp på den angivne port (http://127.0.0.1:8050 som standard)
 def run(records, port=DEFAULT_PORT) -> None:
     create_app(records).run(port=port, debug=False)
