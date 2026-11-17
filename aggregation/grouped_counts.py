@@ -6,8 +6,7 @@ from collections.abc import Callable
 
 # Bygger de grupperede rækker som konsoltabellerne og top-10-listerne bruger.
 # For hver bruger, kilde-IP, destinationsvært og port tælles det, hvor mange events der er, og hvordan de fordeler sig på event, level og status.
-# AllData sendes med fra counts.filtering, men bruges ikke her. Alle tal udregnes ud fra records.
-def highestTabel(AllData=None, records=()):
+def grouped_rows(records=()):
     # Fire dictionaries der hver mapper en værdi (fx en bruger) til en Counter med antal pr. event, level og status
     counts_by_user = defaultdict(Counter)
     counts_by_ip = defaultdict(Counter)

@@ -4,8 +4,9 @@ from dash import Dash, Input, Output, dcc, html
 
 import analysis
 from aggregation import user_ips
+from errors import DashboardError
 
-from . import logview, scatter_plots, tables
+from . import bar_chart, logview, scatter_plots, tables
 
 DEFAULT_PORT = 8050
 
@@ -170,8 +171,12 @@ def create_app(records) -> Dash:
         else "Ingen data at vise"
     )
 
-    # Fane 3-5: de tre diagrammer, hver i sin egen tab
+    # Fane 3-6: diagrammerne, hver i sin egen tab
     chart_tabs = [
+        dcc.Tab(
+            label="Eventtyper",
+            children=[dcc.Graph(figure=bar_chart.event_bar_chart(records))],
+        ),
         dcc.Tab(
             label="Tid på dagen",
             children=[
@@ -297,6 +302,11 @@ def create_app(records) -> Dash:
     return app
 
 
-# Starter dashboardet som en lokal webapp på den angivne port (http://127.0.0.1:8050 som standard)
+# Starter dashboardet som en lokal webapp på den angivne port (http://127.0.0.1:8050 som standard). En optaget port giver en kort fejlbesked i stedet for et traceback.
 def run(records, port=DEFAULT_PORT) -> None:
-    create_app(records).run(port=port, debug=False)
+    try:
+        create_app(records).run(port=port, debug=False)
+    except OSError as error:
+        raise DashboardError(
+            f"Dashboardet kunne ikke startes på port {port}: {error}"
+        ) from None

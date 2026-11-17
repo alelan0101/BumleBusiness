@@ -49,9 +49,9 @@ class PairSeries(TypedDict):
 
 
 # Laver tre top-lister: de brugere, kilde-IP'er og dest_hosts der optræder flest gange i loggen. Dashboardets "Top 10"-fane bruger dem.
-def top_n_lists( records: Iterable[LogRecord], n: int = TOP_N ) -> dict[str, list[tuple[str, int]]]:
-    # highestTabel grupperer alle records, og derefter trækkes de n største ud for hver af de tre nøgler
-    rows = grouped_counts.highestTabel(records=list(records))
+def top_n_lists( records: Iterable[LogRecord], n: int = TOP_N) -> dict[str, list[tuple[str, int]]]:
+    # grouped_rows grupperer alle records, og derefter trækkes de n største ud for hver af de tre nøgler
+    rows = grouped_counts.grouped_rows(records=list(records))
 
     return {
         "users": _rank_rows(rows, "User", n),

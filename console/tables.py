@@ -3,29 +3,29 @@
 
 # Printer en tabel over de grupperede rækker og gemmer den samme tabel i filen printFilteredTable.txt.
 # Keys bestemmer hvilke kolonner der vises, fx ["User", "Events", "Level", "Status"].
-def Sort_And_Table(Compiled_Data, Keys):
+def print_table(compiled_data, keys):
     # Hvis tabellen viser brugere eller porte, filtreres rækkerne for IP'er og værter fra, så de ikke blander sig i tabellen
-    row_keys = [key for key in ("User", "dest") if key in Keys]
+    row_keys = [key for key in ("User", "dest") if key in keys]
     if row_keys:
-        Compiled_Data = [
+        compiled_data = [
             record
-            for record in Compiled_Data
+            for record in compiled_data
             if any(key in record for key in row_keys)
         ]
 
     # Lav tabellen om til tekst. Mangles en værdi, vises "N/A".
     rows = [
-        [str(record.get(key, "N/A")) for key in Keys]
-        for record in Compiled_Data
+        [str(record.get(key, "N/A")) for key in keys]
+        for record in compiled_data
     ]
     # Bredden på hver kolonne er længden af den længste tekst, header medregnet
     widths = [
         max([len(key)] + [len(row[index]) for row in rows])
-        for index, key in enumerate(Keys)
+        for index, key in enumerate(keys)
     ]
 
     header = " | ".join(
-        key.ljust(widths[index]) for index, key in enumerate(Keys)
+        key.ljust(widths[index]) for index, key in enumerate(keys)
     )
     separator = "-+-".join("-" * width for width in widths)
     table_rows = [

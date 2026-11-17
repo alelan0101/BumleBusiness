@@ -1,6 +1,5 @@
 """Parsning af rå loglinjer til strukturerede logrecords."""
 
-
 from datetime import datetime
 
 from model import LogRecord
