@@ -2,9 +2,9 @@
 
 ## Overblik
 
-`analysis.py` beregner top-10 lister og de dataserier, som diagrammerne bygger på. Funktionerne returnerer lister og dictionaries og skriver ikke selv til konsollen, så de kan genbruges af både CLI, dashboard og plot. Top-10-listerne bygger på `grouped_counts.highestTabel` i `aggregation/`, som grupperer hændelserne pr. bruger, kilde-IP, destinationsvært og port. Konsoltabellerne bygges af `console/tables.py`.
+`analysis.py` beregner top-10 lister og de dataserier, som diagrammerne bygger på. Funktionerne returnerer lister og dictionaries og skriver ikke selv til konsollen, så de kan genbruges af både CLI, dashboard og plot. Top-10-listerne bygger på `grouped_counts.highestTabel` i `aggregation/`, som grupperer events pr. bruger, kilde-IP, destinationsvært og port. Konsoltabellerne bygges af `console/tables.py`.
 
-Top-10-listerne, opsummeringen af hændelser pr. time, fejlandel pr. port og de tre diagrammer vises i dashboardet:
+Top-10-listerne, opsummeringen af events pr. time, fejlandel pr. port og de tre diagrammer vises i dashboardet:
 
 ```bash
 pip install dash plotly
@@ -31,7 +31,7 @@ Overbliksfanen viser periode, fejlrate og antal unikke brugere og IP'er fra `use
 | | `scatter_plots.py` | De tre scatter-plots og `build_figures()` |
 | | `tables.py` | Plotly-tabeller: logtabel, top-10, fejlandel pr. port og tom tabel |
 | root | `main.py` | Kommandolinjeflag, konsoltabeller og opstart af dashboardet |
-| | `analysis.py` | Top-10, hændelser pr. time, fejlandel pr. port og dataserier til plots |
+| | `analysis.py` | Top-10, events pr. time, fejlandel pr. port og dataserier til plots |
 | | `parser.py`, `loader.py`, `model.py` | Indlæsning, parsning og datamodel |
 | | `errors.py`, `config.py` | Fejltyper og konstanter |
 
@@ -39,9 +39,9 @@ Overbliksfanen viser periode, fejlrate og antal unikke brugere og IP'er fra `use
 
 | Kolonnepar | Diagram | Begrundelse |
 |---|---|---|
-| `hour` vs. antal hændelser | Scatter med punkter | Begge akser er tal, og hver time er én måling. Søjler ville også virke, men scatter gør det muligt at aflæse enkeltpunkter og en eventuel tendens direkte. |
-| `user` vs. andel fejl | Scatter, ét punkt pr. bruger, med en stiplet linje for den samlede fejlrate | Brugerne er kategorier, så punkterne er ikke forbundet. Referencelinjen gør det muligt at se, hvilke brugere der ligger over og under gennemsnittet. |
-| `dest_port` vs. hændelsestype og IP-klasse | Scatter med port på x-aksen, hændelsestype på y-aksen, boblestørrelse som antal og farve som IP-klasse | Fire variabler i ét plot: port, kategori, antal og intern/ekstern. Portene står i numerisk rækkefølge med servicenavn, så aksen kan læses uden at slå portnumre op. |
+| `hour` vs. antal events | Scatter med punkter | Begge akser er tal, og hver time er en måling. Søjler ville også virke, men scatter gør det muligt at aflæse enkeltpunkter og en eventuel tendens direkte. |
+| `user` vs. andel fejl | Scatter, et punkt pr. bruger, med en stiplet linje for den samlede fejlrate | Brugerne er kategorier, så punkterne er ikke forbundet. Referencelinjen gør det muligt at se, hvilke brugere der ligger over og under gennemsnittet. |
+| `dest_port` vs. eventtype og IP-klasse | Scatter med port på x-aksen, eventtype på y-aksen, boblestørrelse som antal og farve som IP-klasse | Fire variabler i et plot: port, kategori, antal og intern/ekstern. Portene står i numerisk rækkefølge med servicenavn, så aksen kan læses uden at slå portnumre op. |
 
 ## Tests
 

@@ -13,7 +13,9 @@ class UserIPSummary(TypedDict):
     ips_per_user: dict[str, int]
 
 
+# Opsummerer hvor mange brugere og IP-adresser loggen indeholder, og hvor mange forskellige IP'er hver bruger har brugt.
 def get_user_ip_summary(records: Iterable[LogRecord]) -> UserIPSummary:
+    # Set bruges, fordi hver bruger og IP kun skal tælles en gang, uanset hvor mange gange den optræder i loggen
     users = set()
     unique_ips = set()
     ips_by_user = defaultdict(set)
@@ -32,12 +34,15 @@ def get_user_ip_summary(records: Iterable[LogRecord]) -> UserIPSummary:
     }
 
 
+# Bygger en teksttabel med to kolonner: header, en streg under og en række pr. bruger.
+# Kolonnebredden sættes efter den længste tekst i kolonnen.
 def format_user_ip_table(summary: UserIPSummary) -> str:
     headers = ("User", "Unique IPs")
     rows = [
         (user, str(ip_count))
         for user, ip_count in summary["ips_per_user"].items()
     ]
+    # Bredden på hver kolonne er længden af den længste tekst, header medregnet
     widths = [
         max([len(header)] + [len(row[index]) for row in rows])
         for index, header in enumerate(headers)
@@ -54,6 +59,7 @@ def format_user_ip_table(summary: UserIPSummary) -> str:
     return "\n".join((header, separator, *table_rows))
 
 
+# Henter opsummeringen, printer den som tabel og returnerer tallene (så de fx kan bruges igen af den der kaldte funktionen)
 def print_user_ip_table(records: Iterable[LogRecord]) -> UserIPSummary:
     summary = get_user_ip_summary(records)
     print(format_user_ip_table(summary))

@@ -46,7 +46,7 @@ def test_maps_all_nine_fields(small_log_lines: list[str]):
     assert record.msg == "User authenticated successfully"
 
 
-# msg med mellemrum skal blive ét felt og ikke sprede sig ud over linjen.
+# msg med mellemrum skal blive et felt og ikke sprede sig ud over linjen.
 def test_msg_with_spaces_is_one_field(small_log_lines: list[str]):
     record = log_line_parser(small_log_lines)[0][3]
 

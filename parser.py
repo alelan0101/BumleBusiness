@@ -6,9 +6,16 @@ from datetime import datetime
 from model import LogRecord
 
 
+# Gør tekstlinjerne fra logfilen om til LogRecord-objekter.
+# De otte første felter splitter vi ved mellemrum og deler ved "=".
+# msg får vi på en anden måde, fordi beskeden kan indeholde mellemrum.
+#
+# Returnerer to lister: de records der kunne læses, og de linjer der blev
+# sprunget over fordi de ikke passede i formatet.
 def log_line_parser(lines) -> tuple[list[LogRecord], list[str]]:
     list_of_logs = []
     skipped_lines = []
+
     for line in lines:
         try:
             (
@@ -22,7 +29,9 @@ def log_line_parser(lines) -> tuple[list[LogRecord], list[str]]:
                 status,
                 *_,
             ) = line.split(" ")
+            # Alt efter "msg=" er beskeden, også selv om den indeholder mellemrum
             msg = line.split("msg=", 1)[1]
+            # Fjern de citationstegn logfilen pakker beskeden ind i
             if msg.startswith('"') and msg.endswith('"'):
                 msg = msg[1:-1]
             list_of_logs.append(
@@ -38,6 +47,9 @@ def log_line_parser(lines) -> tuple[list[LogRecord], list[str]]:
                     msg=msg,
                 )
             )
+        # En linje med for få felter eller et ugyldigt tal stopper ikke hele
+        # programmet. Den gemmes blot til sidst.
         except (IndexError, ValueError):
             skipped_lines.append(line)
+
     return list_of_logs, skipped_lines

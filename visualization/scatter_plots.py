@@ -5,6 +5,7 @@ import plotly.graph_objects as go
 import analysis
 from model import service_name
 
+# Farver og labels bruges i diagrammerne, så intern/ekstern og succes/fejl/neutral kan kendes igen på tværs af plots
 SCOPE_COLORS = {
     "intern": "#2e7d32",
     "ekstern": "#c62828",
@@ -14,6 +15,7 @@ CATEGORY_LABELS = {"succes": "Succes", "neutral": "Neutral", "fejl": "Fejl"}
 CATEGORY_ORDER = ("succes", "neutral", "fejl")
 NO_DATA_MESSAGE = "Ingen data at vise"
 
+# Fælles layout for alle tre diagrammer: hvid baggrund, samme font og samme højde, så fanerne ligner hinanden
 BASE_LAYOUT = {
     "template": "plotly_white",
     "font": {"family": "sans-serif", "size": 13},
@@ -22,6 +24,7 @@ BASE_LAYOUT = {
 }
 
 
+# Sætter titel, akser og den fælles stil på en figur og returnerer figuren **overrides bruges til de indstillinger der kun gælder for et diagram
 def _layout(figure, title, x_axis, y_axis, **overrides):
     figure.update_layout(
         title=title,
@@ -33,6 +36,7 @@ def _layout(figure, title, x_axis, y_axis, **overrides):
     return figure
 
 
+# Tom figur med en tekst midt i, brugt når der ikke er data at vise
 def _empty_figure(title, x_title, y_title):
     figure = go.Figure()
     figure.add_annotation(
@@ -41,10 +45,11 @@ def _empty_figure(title, x_title, y_title):
     return _layout(figure, title, {"title": x_title}, {"title": y_title})
 
 
+# Punktdiagram med et punkt pr. time på dagen. x er timen (0-23), og y er antal events i den time.
 def hour_event_scatter(records):
-    title = "Hændelser pr. time på dagen"
+    title = "Events pr. time på dagen"
     if not records:
-        return _empty_figure(title, "Time på dagen", "Antal hændelser")
+        return _empty_figure(title, "Time på dagen", "Antal events")
 
     series = analysis.hourly_event_counts(records)
     figure = go.Figure(
@@ -53,8 +58,8 @@ def hour_event_scatter(records):
             y=[count for _, count in series],
             mode="markers",
             marker={"size": 10, "color": "#1565c0"},
-            hovertemplate="Kl. %{x}: %{y} hændelser<extra></extra>",
-            name="Hændelser",
+            hovertemplate="Kl. %{x}: %{y} events<extra></extra>",
+            name="Events",
         )
     )
     return _layout(
@@ -66,16 +71,18 @@ def hour_event_scatter(records):
             "dtick": 1,
             "range": [-0.5, 23.5],
         },
-        {"title": "Antal hændelser", "rangemode": "tozero"},
+        {"title": "Antal events", "rangemode": "tozero"},
         showlegend=False,
     )
 
 
+# Punktdiagram med et punkt pr. bruger. y er hvor stor en del af brugerens events der var fejl, og den stiplede linje er gennemsnittet for alle.
 def user_failure_scatter(records):
     title = "Andel fejl pr. bruger"
     if not records:
         return _empty_figure(title, "Bruger", "Andel fejl (%)")
 
+    # Den samlede fejlrate udregnes for at kunne tegne referencelinjen
     series = analysis.user_failure_rates(records)
     total_failures = sum(entry["failures"] for entry in series)
     total_events = sum(entry["total"] for entry in series)
@@ -92,7 +99,7 @@ def user_failure_scatter(records):
             ],
             hovertemplate=(
                 "%{x}: %{y:.1f} % fejl "
-                "(%{customdata[0]} af %{customdata[1]} hændelser)"
+                "(%{customdata[0]} af %{customdata[1]} events)"
                 "<extra></extra>"
             ),
             name="Brugere",
@@ -113,10 +120,11 @@ def user_failure_scatter(records):
     )
 
 
+# Boblediagram: port på x-aksen og eventtype på y-aksen. Boblens størrelse er antal events, og farven viser om IP'en er intern eller ekstern. Fire variable i samme plot.
 def port_event_scatter(records):
-    title = "Destinationsport vs. hændelsestype og IP-klasse"
+    title = "Destinationsport vs. eventtype og IP-klasse"
     if not records:
-        return _empty_figure(title, "Destinationsport", "Hændelsestype")
+        return _empty_figure(title, "Destinationsport", "Eventtype")
 
     series = analysis.port_event_series(records)
     ports = sorted({entry["port"] for entry in series})
@@ -124,6 +132,7 @@ def port_event_scatter(records):
     label_by_port = dict(zip(ports, labels))
     max_count = max(entry["count"] for entry in series)
 
+    # En trace pr. IP-klasse, så de får hver sin farve i legend'en
     figure = go.Figure()
     for scope in sorted({entry["ip_scope"] for entry in series}):
         entries = [entry for entry in series if entry["ip_scope"] == scope]
@@ -147,7 +156,7 @@ def port_event_scatter(records):
                     [entry["count"], entry["ip_scope"]] for entry in entries
                 ],
                 hovertemplate=(
-                    "%{x} – %{y}<br>%{customdata[0]} hændelser "
+                    "%{x} – %{y}<br>%{customdata[0]} events "
                     "(%{customdata[1]} IP)<extra></extra>"
                 ),
                 name=scope,
@@ -164,7 +173,7 @@ def port_event_scatter(records):
             "categoryarray": labels,
         },
         {
-            "title": "Hændelsestype",
+            "title": "Eventtype",
             "type": "category",
             "categoryorder": "array",
             "categoryarray": [
@@ -175,6 +184,7 @@ def port_event_scatter(records):
     )
 
 
+# Bygger alle tre diagrammer og returnerer dem i en dictionary med faste nøgler, som dashboardet slår op i
 def build_figures(records) -> dict[str, go.Figure]:
     records = list(records)
     return {

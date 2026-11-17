@@ -4,7 +4,7 @@
 
 Bumle Business er en virksomhed, der benytter en VPN-forbindelse til at oprette sikker forbindelse til virksomhedens servere. Virksomheden har opdaget mistænkelig aktivitet på nogle af sine servere og har mistanke om, at uvedkommende kan have fået adgang via VPN-forbindelsen. 
 
-For at undersøge hændelserne bedre ønsker Bumle Business en løsning, der kan gemme og præsentere logdata fra virksomhedens servere. Løsningen skal gøre det muligt at få et overblik over logdataene ved hjælp af tabeller og diagrammer, så mistænkelig aktivitet lettere kan identificeres og undersøges. 
+For at undersøge events bedre ønsker Bumle Business en løsning, der kan gemme og præsentere logdata fra virksomhedens servere. Løsningen skal gøre det muligt at få et overblik over logdataene ved hjælp af tabeller og diagrammer, så mistænkelig aktivitet lettere kan identificeres og undersøges. 
 
 I projektet skal I udvikle en løsning, der tager udgangspunkt i virksomhedens behov. Samtidig skal I anvende SCRUM som projektstyringsmetode og dokumentere jeres arbejdsproces. 
 
@@ -20,7 +20,7 @@ Der skal udarbejdes User Stories, som beskriver funktionalitet ud fra brugerens 
 
 2. Sprint: 
 
-Projektet skal planlægges og gennemføres i ét Sprint. 
+Projektet skal planlægges og gennemføres i et Sprint. 
 
 3. Task Board: 
 
