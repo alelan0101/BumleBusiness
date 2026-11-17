@@ -15,6 +15,7 @@ HEADER_HEIGHT = 30
 EMPTY_TABLE_HEIGHT = 200
 MARGIN = {"l": 20, "r": 20, "t": 20, "b": 20}
 
+# De tekstnavne der vises i tabellens header i stedet for feltnavnene
 COLUMN_LABELS = {
     "timestamp": "Tid",
     "event": "Event",
@@ -27,6 +28,7 @@ COLUMN_LABELS = {
     "msg": "Besked",
 }
 
+# Hvordan et felt hentes ud af en record og laves om til tekst i tabellen
 COLUMN_VALUES = {
     "timestamp": lambda record: record.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
     "event": lambda record: str(record.event),
@@ -41,8 +43,10 @@ COLUMN_VALUES = {
 
 DEFAULT_COLUMNS = tuple(COLUMN_LABELS)
 
+# Kun disse to kolonner får farvet baggrund, så de skiller sig ud
 COLORED_COLUMNS = ("level", "status")
 
+# Farve pr. værdi: grøn for det der gik godt, rød/orange for det der kræver opmærksomhed
 CELL_COLORS = {
     "INFO": "#c8e6c9",
     "WARN": "#ffe0b2",
@@ -53,6 +57,7 @@ CELL_COLORS = {
 }
 
 
+# Henter teksten til en celle. Lange beskeder klippes af, så rækken ikke bliver meget bred.
 def format_cell(record, column) -> str:
     value = COLUMN_VALUES[column](record)
     if column == "msg" and len(value) > MSG_LIMIT:
@@ -60,6 +65,7 @@ def format_cell(record, column) -> str:
     return value
 
 
+# Returnerer baggrundsfarven for hver celle i en kolonne. Enten en farve til hele kolonnen eller en liste med en farve pr. række.
 def cell_fill(records, column):
     if column not in COLORED_COLUMNS:
         return NEUTRAL_CELL_COLOR
@@ -69,6 +75,7 @@ def cell_fill(records, column):
     ]
 
 
+# Bygger logtabellen: en kolonne pr. felt og en række pr. record.
 def build_table(records, columns=DEFAULT_COLUMNS):
     cells = [
         [format_cell(record, column) for record in records]
@@ -99,6 +106,7 @@ def build_table(records, columns=DEFAULT_COLUMNS):
     return figure
 
 
+# Bygger en tabel ud fra færdige kolonner, dvs. når tallene allerede er regnet ud. Bruges til top-10, overblikket og port-tabellen.
 def build_columns_table(headers, columns):
     figure = go.Figure(
         data=[
@@ -119,7 +127,8 @@ def build_columns_table(headers, columns):
     return figure
 
 
-def build_top_n_table(entries, value_label, count_label="Hændelser"):
+# Tabel med to kolonner: værdien (fx et brugernavn) og antal events
+def build_top_n_table(entries, value_label, count_label="Events"):
     return build_columns_table(
         (value_label, count_label),
         (
@@ -129,6 +138,7 @@ def build_top_n_table(entries, value_label, count_label="Hændelser"):
     )
 
 
+# Tabel uden rækker og med en tekst om at filtrene ikke matcher noget
 def build_empty_table(columns=DEFAULT_COLUMNS):
     figure = build_table([], columns)
     figure.add_annotation(
