@@ -79,3 +79,6 @@ python main.py --run-tests --coverage
 ```
 
 Loguddragene ligger i `tests/fixtures/`: `small_log.txt` er et gyldigt udsnit af `cyber_security_log_sample.txt`, og `edge_cases.txt` indeholder linjer, der skal afvises (manglende felt, ugyldig port), og linjer med grænsetilfælde (tom `msg`, citationstegn i `msg`).
+
+# Scrum
+Epics er brugt til overordnet at definere kravspecifikationer. Features er brugt til at definere hvilke features der skal udarbejdes for at opnå de overordnede kravspecifikation, som er defineret i epics. Under features ligger tasks, som er brugt til mere præcist at definere det der skal udarbejdes for at opnå en given kravspecifikation. User stories er de ønsker en bruger har til et givent produkt eg. "Som bruger ønsker jeg." Tasks bliver oprettet på baggrund af brugerens ønsker. Acceptkriterier er de minimums krav der skal opnås for at en user story er opfyldt. Task boardet bruges til at udelegere tasks, i task boardet kan man se hvor langt en person er med en given opgave.
