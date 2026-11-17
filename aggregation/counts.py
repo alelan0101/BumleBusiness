@@ -3,7 +3,7 @@
 
 # Tæller hvor mange gange hver bruger, level, event og status optræder i loggen.
 # Returnerer en liste med fire dictionaries og andelen af login-forsøg der fejlede.
-def filtering(records):
+def count_by_field(records):
     # Fire lister til at samle de unikke værdier, og fire dictionaries til at tælle hvor mange gange hver værdi optræder
     everyUser = []
     everyLevel = []

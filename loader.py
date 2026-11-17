@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 from config import DEFAULT_LOG_PATH, LOG_ENCODING

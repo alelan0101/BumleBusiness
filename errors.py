@@ -1,4 +1,3 @@
-
 # Alle fejl som programmet selv regner med at kunne ramme, samles under
 # BumleBusinessError. main.py fanger den og printer en kort fejlbesked i
 # stedet for et traceback. Undtagelserne nedenfor gør det muligt at se,
@@ -22,3 +21,8 @@ class ParseError(BumleBusinessError):
 # Et LogRecord indeholder ugyldige eller manglende data
 class DataError(BumleBusinessError):
     """Fejl ved ugyldige eller manglende data i en record."""
+
+
+# Dashboardet kunne ikke startes, fx fordi porten allerede er i brug
+class DashboardError(BumleBusinessError):
+    """Fejl ved opstart af dashboardet."""
