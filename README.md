@@ -4,7 +4,13 @@
 
 `analysis.py` beregner top-10 lister og de dataserier, som diagrammerne bygger på. Funktionerne returnerer lister og dictionaries og skriver ikke selv til konsollen, så de kan genbruges af både CLI, dashboard og plot. Top-10-listerne bygger på `grouped_counts.highestTabel` i `aggregation/`, som grupperer events pr. bruger, kilde-IP, destinationsvært og port. Konsoltabellerne bygges af `console/tables.py`.
 
-Top-10-listerne, opsummeringen af events pr. time, fejlandel pr. port og de tre diagrammer vises i dashboardet:
+### Malware match
+Sikkerheds detection nuværende holder øje med MALWARE_SIGNATURE_MATCH og login failures. Hvis der er mange login failures, så en user authenication, og et password reset exempelvis, er det ret typisk eksempel på mistænkelig aktivitet, så programmet holder også øje med det. Disse bliver printed i terminal under tabellerne.
+#### Fundet
+Det er ifølge det indhenting, der er lavet, er det første brud sket på walter. Det kan ses blandet andet fordi han har flest fejl, hvor mange af den er login_failed. Derefter er der en user authenentication fra den IP, og så er det muligt gennem de ip spor den spytter ud at følge hvordan den hopper rundt, og ender med admin password. Den IP, 172.16.0.44, har en malware match, og senere en reset på admin password.
+
+
+Top-10-listerne, opsummeringen af hændelser pr. time, fejlandel pr. port og de tre diagrammer vises i dashboardet:
 
 ```bash
 pip install dash plotly
