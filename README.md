@@ -79,3 +79,6 @@ python main.py --run-tests --coverage
 ```
 
 Loguddragene ligger i `tests/fixtures/`: `small_log.txt` er et gyldigt udsnit af `cyber_security_log_sample.txt`, og `edge_cases.txt` indeholder linjer, der skal afvises (manglende felt, ugyldig port), og linjer med grænsetilfælde (tom `msg`, citationstegn i `msg`).
+
+# Scrum
+Den generelle ting, vi har haft brugt scrum til, er at definere de overordnede dele som epics, som blev nedelt til tasks som definerede de individuelle funktioner, som der så havde userstories der gennemgik de trin og krav, som der var til de dele af programmet. Vi brugte også task boardet til at holde styr på, hvem der var i gang med hvilken del af opgaven.
