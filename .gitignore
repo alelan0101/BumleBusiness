@@ -1,5 +1,6 @@
 **/__pycache__/
 **.txt
+!requirements-dev.txt
 .pytest_cache/
 .coverage
 htmlcov/

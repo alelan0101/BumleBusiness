@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bumle Business · kaldgraf</title>
+<style>
+  * { box-sizing: border-box }
+  html, body { margin: 0; height: 100% }
+  body {
+    display: flex; flex-direction: column;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    color: #1f2937; background: #f7f8fa;
+  }
+  header { padding: 10px 18px 11px; background: #fff; border-bottom: 1px solid #e5e7eb }
+  h1 { margin: 0 0 9px; font-size: 14px; font-weight: 600 }
+  h1 span { color: #6b7280; font-weight: 400 }
+  .bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap }
+  nav { display: flex; gap: 3px; background: #f1f3f6; padding: 3px; border-radius: 8px }
+  nav button {
+    border: 0; background: transparent; padding: 6px 13px; border-radius: 6px;
+    font: inherit; font-size: 12.5px; color: #4b5563; cursor: pointer;
+  }
+  nav button:hover { color: #111 }
+  nav button.active { background: #fff; color: #111; font-weight: 600; box-shadow: 0 1px 2px #0002 }
+  #search {
+    border: 1px solid #d5d9e0; border-radius: 7px; padding: 6px 10px;
+    font: inherit; font-size: 12.5px; width: 230px; margin-left: auto;
+  }
+  #search:focus { outline: 2px solid #93c5fd; border-color: #60a5fa }
+  #reset, #fit {
+    border: 1px solid #d5d9e0; background: #fff; border-radius: 7px; padding: 6px 12px;
+    font: inherit; font-size: 12.5px; color: #4b5563; cursor: pointer;
+  }
+  #reset:hover, #fit:hover { color: #111; border-color: #c7ccd4 }
+  #fit { margin-left: 2px }
+  .legend { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 9px }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px; border: 1px solid #e3e6eb;
+    background: #fff; border-radius: 999px; padding: 3px 10px 3px 7px;
+    font: inherit; font-size: 11.5px; color: #4b5563; cursor: pointer;
+  }
+  .chip:hover { border-color: #b9bfc8; color: #111 }
+  .chip span { width: 9px; height: 9px; border-radius: 50% }
+  main { flex: 1; min-height: 0; padding: 10px 18px 14px; display: flex; flex-direction: column }
+  section.view { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px }
+  section.view[hidden] { display: none }
+  .caption { margin: 0; font-size: 12.5px; color: #6b7280 }
+  .canvas {
+    flex: 1; min-height: 0; position: relative; overflow: hidden;
+    background: #fff; border: 1px solid #e5e7eb; border-radius: 10px;
+  }
+  .canvas svg { display: block; width: 100%; height: 100%; cursor: grab; touch-action: none }
+  .canvas svg.panning { cursor: grabbing }
+  svg.graph text { font-family: "Segoe UI", system-ui, sans-serif }
+  svg.graph g.node, svg.graph g.edge { transition: opacity .12s ease }
+  svg.graph.focus g.node:not(.hl), svg.graph.focus g.edge:not(.hl) { opacity: .12 }
+  svg.graph.focus g.node.hl path { fill: #fff1e6 }
+  svg.graph g.node.hl path, svg.graph g.node.hl ellipse { stroke: #e8590c; stroke-width: 2.4px }
+  svg.graph.focus g.edge.hl path { stroke: #e8590c; stroke-width: 1.8px }
+  svg.graph.focus g.edge.hl polygon { fill: #e8590c; stroke: #e8590c }
+  svg.graph.searching g.node:not(.found), svg.graph.searching g.edge { opacity: .1 }
+  svg.graph.searching g.node.found path { fill: #ffe4e6; stroke: #dc2626; stroke-width: 3px }
+  #tip {
+    position: fixed; z-index: 10; pointer-events: none; white-space: pre-line;
+    max-width: 460px; padding: 7px 9px; border-radius: 7px; font-size: 11.5px;
+    line-height: 1.45; color: #e5e7eb; background: #111827; box-shadow: 0 4px 14px #0003;
+  }
+  footer { padding: 0 18px 10px; font-size: 11px; color: #9ca3af }
+  kbd {
+    font: inherit; font-size: 10.5px; padding: 1px 5px; border-radius: 4px;
+    border: 1px solid #d5d9e0; background: #fff; color: #6b7280;
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Bumle Business <span>· kaldgraf med pyan3</span></h1>
+  <div class="bar">
+    <nav>
+$tabs
+    </nav>
+    <input id="search" type="search" placeholder="Søg modul, klasse eller funktion" autocomplete="off">
+    <button id="fit" type="button">Tilpas</button>
+    <button id="reset" type="button">Nulstil</button>
+  </div>
+  <div class="legend">
+$chips
+  </div>
+</header>
+<main>
+$views
+</main>
+<footer>
+  Klik på en boks for at fremhæve dens kald og kaldere · klik i baggrunden eller <kbd>Esc</kbd> for at rydde · rul for zoom · træk for at flytte · "Tilpas" viser hele grafen · <kbd>←</kbd> <kbd>→</kbd> skifter visning
+</footer>
+<div id="tip" hidden></div>
+<script>
+(function () {
+  var XLINK = 'http://www.w3.org/1999/xlink';
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('nav button'));
+  var views = Array.prototype.slice.call(document.querySelectorAll('section.view'));
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var search = document.getElementById('search');
+  var tip = document.getElementById('tip');
+  var current = views[0];
+
+  function svgOf(view) { return view.querySelector('svg'); }
+
+  function nameOf(node) {
+    var title = node.querySelector('title');
+    return title ? title.textContent : '';
+  }
+
+  function anchorText(anchor) {
+    if (!anchor) return '';
+    return anchor.getAttributeNS(XLINK, 'title') || anchor.getAttribute('xlink:title') || '';
+  }
+
+  function setBox(svg, box) {
+    svg.setAttribute('viewBox', [box.x, box.y, box.width, box.height].join(' '));
+  }
+
+  function expand(state, seeds, hops) {
+    var seen = new Set(seeds);
+    var frontier = seeds.slice();
+    for (var step = 0; step < hops; step += 1) {
+      var next = [];
+      frontier.forEach(function (name) {
+        (state.succ.get(name) || []).forEach(function (other) {
+          if (!seen.has(other)) { seen.add(other); next.push(other); }
+        });
+        (state.pred.get(name) || []).forEach(function (other) {
+          if (!seen.has(other)) { seen.add(other); next.push(other); }
+        });
+      });
+      frontier = next;
+      if (!frontier.length) break;
+    }
+    return seen;
+  }
+
+  function clearFocus(view) {
+    var svg = svgOf(view);
+    if (!svg) return;
+    svg.classList.remove('focus');
+    view.querySelectorAll('.hl').forEach(function (el) { el.classList.remove('hl'); });
+  }
+
+  function focusNodes(view, nodes, hops) {
+    if (!nodes.length) return;
+    var state = view.state;
+    var svg = svgOf(view);
+    var keep = expand(state, nodes.map(nameOf), hops === undefined ? 1 : hops);
+    svg.classList.add('focus');
+    state.nodes.forEach(function (node, name) {
+      node.classList.toggle('hl', keep.has(name));
+    });
+    state.edges.forEach(function (edge) {
+      edge.el.classList.toggle('hl', keep.has(edge.src) && keep.has(edge.dst));
+    });
+  }
+
+  function resetView(view) {
+    clearFocus(view);
+    var svg = svgOf(view);
+    if (svg) setBox(svg, view.state.initial || view.state.home);
+  }
+
+  function prime(view) {
+    var svg = svgOf(view);
+    var state = view.state;
+    if (!svg || state.primed) return;
+    state.primed = true;
+    state.initial = state.home;
+    var matrix = svg.getScreenCTM();
+    var rect = svg.getBoundingClientRect();
+    if (!matrix || !rect.width) return;
+    if (matrix.a >= 0.55) return;
+    var width = rect.width;
+    var height = rect.height;
+    state.initial = {
+      x: state.home.x,
+      y: state.home.y,
+      width: width,
+      height: height
+    };
+    setBox(svg, state.initial);
+  }
+
+  function applySearch(view) {
+    var svg = svgOf(view);
+    if (!svg) return;
+    var term = search.value.trim().toLowerCase();
+    svg.classList.toggle('searching', Boolean(term));
+    view.querySelectorAll('g.node.found').forEach(function (node) { node.classList.remove('found'); });
+    if (!term) return;
+    view.querySelectorAll('g.node').forEach(function (node) {
+      if ((node.__query || '').indexOf(term) !== -1) node.classList.add('found');
+    });
+  }
+
+  function show(id) {
+    views.forEach(function (view) { view.hidden = view.dataset.view !== id; });
+    tabs.forEach(function (tab) { tab.classList.toggle('active', tab.dataset.view === id); });
+    views.forEach(function (view) { if (view.dataset.view === id) current = view; });
+    if (current) { prime(current); applySearch(current); }
+  }
+
+  views.forEach(function (view) {
+    var svg = svgOf(view);
+    if (!svg) return;
+    svg.classList.add('graph');
+    svg.removeAttribute('width');
+    svg.removeAttribute('height');
+    var box = svg.viewBox.baseVal;
+    var state = view.state = {
+      home: { x: box.x, y: box.y, width: box.width, height: box.height },
+      initial: null,
+      primed: false,
+      nodes: new Map(), succ: new Map(), pred: new Map(), edges: []
+    };
+    view.querySelectorAll('g.node').forEach(function (node) {
+      var name = nameOf(node);
+      if (!name) return;
+      state.nodes.set(name, node);
+      node.__query = (name + ' ' + anchorText(node.querySelector('a'))).toLowerCase();
+    });
+    view.querySelectorAll('g.edge').forEach(function (el) {
+      var title = el.querySelector('title');
+      if (!title) return;
+      var parts = title.textContent.split('->');
+      if (parts.length !== 2) return;
+      var src = parts[0], dst = parts[1];
+      state.edges.push({ src: src, dst: dst, el: el });
+      if (!state.succ.has(src)) state.succ.set(src, []);
+      state.succ.get(src).push(dst);
+      if (!state.pred.has(dst)) state.pred.set(dst, []);
+      state.pred.get(dst).push(src);
+    });
+
+    svg.addEventListener('click', function (event) {
+      var node = event.target.closest('g.node');
+      if (node) focusNodes(view, [node]);
+      else clearFocus(view);
+    });
+
+    svg.addEventListener('wheel', function (event) {
+      event.preventDefault();
+      var ctm = svg.getScreenCTM();
+      if (!ctm) return;
+      var point = svg.createSVGPoint();
+      point.x = event.clientX;
+      point.y = event.clientY;
+      var cursor = point.matrixTransform(ctm.inverse());
+      var size = svg.viewBox.baseVal;
+      var factor = Math.exp(event.deltaY * 0.0015);
+      var width = Math.min(Math.max(size.width * factor, 20), state.home.width * 14);
+      var scale = width / size.width;
+      setBox(svg, {
+        x: cursor.x - (cursor.x - size.x) * scale,
+        y: cursor.y - (cursor.y - size.y) * scale,
+        width: width,
+        height: size.height * scale
+      });
+    }, { passive: false });
+
+    var drag = null;
+    svg.addEventListener('pointerdown', function (event) {
+      if (event.button !== 0 || !svg.getScreenCTM()) return;
+      var box = svg.viewBox.baseVal;
+      drag = {
+        x: event.clientX, y: event.clientY,
+        box: { x: box.x, y: box.y, width: box.width, height: box.height },
+        units: 1 / svg.getScreenCTM().a
+      };
+      svg.classList.add('panning');
+      svg.setPointerCapture(event.pointerId);
+    });
+    svg.addEventListener('pointermove', function (event) {
+      if (!drag) return;
+      setBox(svg, {
+        x: drag.box.x - (event.clientX - drag.x) * drag.units,
+        y: drag.box.y - (event.clientY - drag.y) * drag.units,
+        width: drag.box.width,
+        height: drag.box.height
+      });
+    });
+    function stopDrag() {
+      drag = null;
+      svg.classList.remove('panning');
+    }
+    svg.addEventListener('pointerup', stopDrag);
+    svg.addEventListener('pointercancel', stopDrag);
+    svg.addEventListener('dblclick', function () { resetView(view); });
+  });
+
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () { show(tab.dataset.view); });
+  });
+
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      if (!current) return;
+      var picked = Array.prototype.slice.call(
+        current.querySelectorAll('g.node.' + chip.dataset.cls)
+      );
+      focusNodes(current, picked, 0);
+    });
+  });
+
+  search.addEventListener('input', function () { if (current) applySearch(current); });
+  document.getElementById('reset').addEventListener('click', function () {
+    search.value = '';
+    views.forEach(resetView);
+  });
+  document.getElementById('fit').addEventListener('click', function () {
+    if (!current) return;
+    clearFocus(current);
+    setBox(svgOf(current), current.state.home);
+  });
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+      search.value = '';
+      views.forEach(resetView);
+      return;
+    }
+    if (event.target === search) return;
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    var index = views.indexOf(current) + (event.key === 'ArrowRight' ? 1 : -1);
+    if (index >= 0 && index < views.length) show(views[index].dataset.view);
+  });
+
+  document.addEventListener('pointermove', function (event) {
+    var anchor = event.target.closest ? event.target.closest('a') : null;
+    var text = anchorText(anchor);
+    if (!text) { tip.hidden = true; return; }
+    tip.hidden = false;
+    tip.textContent = text;
+    var left = event.clientX + 14;
+    var top = event.clientY + 16;
+    if (left + tip.offsetWidth > window.innerWidth - 8) left = event.clientX - tip.offsetWidth - 14;
+    if (top + tip.offsetHeight > window.innerHeight - 8) top = event.clientY - tip.offsetHeight - 14;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+  });
+  document.addEventListener('pointerleave', function () { tip.hidden = true; });
+
+  show(views[0].dataset.view);
+}());
+</script>
+</body>
+</html>

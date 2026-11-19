@@ -71,6 +71,20 @@ Dashboardet har faner til logtabellen, overblikket, de fire diagrammer, fejlande
 | `dest_port` vs. eventtype og IP-klasse | Scatter med port på x-aksen, eventtype på y-aksen, boblestørrelse som antal og farve som IP-klasse | Fire variabler i et plot: port, kategori, antal og intern/ekstern. Portene står i numerisk rækkefølge med servicenavn, så aksen kan læses uden at slå portnumre op. |
 | `event` vs. antal | Søjlediagram | Eventtyperne er kategorier, og højden på søjlerne gør dem direkte sammenlignelige. |
 
+## Kaldgraf
+
+`docs/callgraph.html` er en selvstændig interaktiv side med kaldgrafen for koden. Den har ti visninger: moduloverblik, hele grafen, CLI-flowet fra `main.main`, detektionen og seks visninger af dashboardet — `visualization.dashboard.create_app` selv og de fem faner logtabel, overblik, diagrammer, fejlandel pr. port og top 10. Klik på en boks for at fremhæve dens kald og kaldere, brug søgefeltet til at finde en funktion, og chip-rækken til at fremhæve et helt modul.
+
+Siden bygges med `pyan3` og Graphviz:
+
+```bash
+pip install -r requirements-dev.txt
+scoop install graphviz   # eller winget install Graphviz.Graphviz
+python tools/callgraph.py
+```
+
+`tools/callgraph.py` finder selv projektets Python-filer (uden `tests/`), kører `pyan3`, filtrerer hver visning og tegner den med `dot`. Siden har ingen eksterne referencer, så den kan åbnes direkte fra disken og virker uden netværk. Visningerne styres af `VIEWS` i scriptet: hver visning angiver en eller flere startfunktioner og hvor mange kald den skal følge.
+
 ## Tests
 
 Testene ligger i `tests/` og kræver Python 3.10 eller nyere, ligesom programmet, samt `pytest` og `pytest-cov` fra `requirements.txt`. Kør kommandoerne fra repoets rod.
