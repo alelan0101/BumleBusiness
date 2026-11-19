@@ -1,0 +1,234 @@
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usetheme{metropolis}
+\metroset{sectionpage=none}
+\usepackage{fontspec}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{fontawesome5}
+
+\definecolor{accent}{HTML}{0F6E6E}
+\definecolor{muted}{HTML}{6B7280}
+
+\setbeamercolor{palette primary}{bg=accent, fg=white}
+\setbeamercolor{frametitle}{bg=accent, fg=white}
+\setbeamercolor{progress bar}{fg=accent, bg=accent!25}
+\setbeamercolor{alerted text}{fg=accent}
+
+\newcommand{\done}{\textcolor{accent}{\faCheckCircle}}
+\newcommand{\open}{\textcolor{muted}{\faCircle}}
+
+\begin{document}
+
+\begin{frame}[plain,noframenumbering]
+  \vfill
+  {\usebeamerfont{title}\color{accent}\Huge SCRUM-overblik\par}
+  \vspace{0.4em}
+  {\usebeamerfont{subtitle}\color{muted}\Large Epics, Features og User Stories\par}
+  \vspace{1.6em}
+  \textcolor{accent}{\rule{4cm}{2pt}}
+  \vfill
+  {\small Bumle Business \quad$\cdot$\quad Sprint 1\par}
+\end{frame}
+
+\begin{frame}{Dagsorden}
+  \begin{columns}[T]
+    \column{0.46\textwidth}
+    \textbf{Struktur}
+    \vspace{0.4em}
+    \begin{itemize}
+      \item 5 epics
+      \item 12 features
+      \item 13 user stories
+    \end{itemize}
+    \vspace{0.2em}
+    {\footnotesize\color{muted}Opgaver (tasks) er bevidst udeladt -- de hører på boardet.}
+    \column{0.50\textwidth}
+    \textbf{Epics}
+    \vspace{0.4em}
+    \begin{itemize}
+      \item EP-01 Datagrundlag og indlæsning
+      \item EP-02 Præsentation af logs
+      \item EP-03 Analyse og visualisering
+      \item EP-04 Robusthed og kodekvalitet
+      \item EP-05 Dokumentation og aflevering
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Hierarki}
+  \begin{center}
+    \Large
+    \textcolor{accent}{\textbf{Epic}}\\[0.2em]
+    \footnotesize forretningsmål og værdi\\[0.7em]
+    $\downarrow$\\[0.7em]
+    \textcolor{accent}{\textbf{Feature}}\\[0.2em]
+    \footnotesize afgrænset leverance, der indfrier målet\\[0.7em]
+    $\downarrow$\\[0.7em]
+    \textcolor{accent}{\textbf{User Story}}\\[0.2em]
+    \footnotesize brugerbehov med acceptkriterier
+  \end{center}
+  \vfill
+  {\footnotesize\color{muted}\done{}~afsluttet \quad \open{}~åben i sprinten}
+\end{frame}
+
+\begin{frame}{Overblik}
+  \centering
+  \small
+  \begin{tabularx}{\textwidth}{@{}l X c c@{}}
+    \toprule
+    \textbf{Epic} & \textbf{Titel} & \textbf{Features} & \textbf{US} \\
+    \midrule
+    EP-01 & Datagrundlag og indlæsning & 2 & 3 \\
+    EP-02 & Præsentation af logs       & 2 & 2 \\
+    EP-03 & Analyse og visualisering   & 4 & 4 \\
+    EP-04 & Robusthed og kodekvalitet  & 3 & 3 \\
+    EP-05 & Dokumentation og aflevering& 1 & 1 \\
+    \midrule
+    \textbf{I alt} & & \textbf{12} & \textbf{13} \\
+    \bottomrule
+  \end{tabularx}
+\end{frame}
+
+\section{EP-01}
+\begin{frame}{EP-01 Datagrundlag og indlæsning}{Sikker indlæsning og strukturerede, berigede records}
+  \begin{columns}[T]
+    \column{0.44\textwidth}
+    \textbf{Features}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item F-01.1 Filindlæsning
+      \item F-01.2 Parsing og datamodel
+    \end{itemize}
+    \vspace{0.4em}
+    {\footnotesize\color{muted}Forretningsværdi: uden et pålideligt datagrundlag er ingen analyse troværdig.}
+    \column{0.54\textwidth}
+    \textbf{User Stories}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item[\done] US-01 Indlæs rå logfil i hukommelsen
+      \item[\done] US-02 Parse loglinjer til strukturerede records
+      \item[\done] US-03 Berig logdata med afledte felter
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\section{EP-02}
+\begin{frame}{EP-02 Præsentation af logs}{Logdata i en overskuelig tabel i stedet for rå tekst}
+  \begin{columns}[T]
+    \column{0.44\textwidth}
+    \textbf{Features}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item F-02.1 Tabelvisning
+      \item F-02.2 Navigation i data
+    \end{itemize}
+    \vspace{0.4em}
+    {\footnotesize\color{muted}Forretningsværdi: analytikeren finder en konkret hændelse på få sekunder.}
+    \column{0.54\textwidth}
+    \textbf{User Stories}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item[\done] US-04 Vis logdata i en interaktiv tabel
+      \item[\done] US-05 Sorter i logvisningen
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\section{EP-03}
+\begin{frame}{EP-03 Analyse og visualisering}{Overblik, sammenhænge og fremhævet mistænkelig aktivitet}
+  \begin{columns}[T]
+    \column{0.44\textwidth}
+    \textbf{Features}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item F-03.1 Overblik og statistik
+      \item F-03.2 Sammenholdsanalyse
+      \item F-03.3 Diagrammer
+      \item F-03.4 Mistænkelig aktivitet
+    \end{itemize}
+    \vspace{0.2em}
+    {\footnotesize\color{muted}Forretningsværdi: her bliver den mistænkelige VPN-aktivitet synlig.}
+    \column{0.54\textwidth}
+    \textbf{User Stories}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item[\done] US-06 Statistisk overblik over loggen
+      \item[\done] US-07 Sammenhænge med scatter-plots
+      \item[\done] US-08 Visuelt dashboard over logdataene
+      \item[\done] US-09 Mistænkelig aktivitet fremhævet
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\section{EP-04}
+\begin{frame}{EP-04 Robusthed og kodekvalitet}{Modulær opbygning, kontrolleret fejlhåndtering og tests}
+  \begin{columns}[T]
+    \column{0.44\textwidth}
+    \textbf{Features}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item F-04.1 Fejlhåndtering
+      \item F-04.2 Kodearkitektur
+      \item[\open] F-04.3 Test og validering
+    \end{itemize}
+    \vspace{0.2em}
+    {\footnotesize\color{muted}Forretningsværdi: løsningen kan demonstreres stabilt og videreudvikles.}
+    \column{0.54\textwidth}
+    \textbf{User Stories}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item[\done] US-10 Programmets fejl håndteres uden crash
+      \item[\done] US-11 Koden er modulær og genbrugelig
+      \item[\done] US-12 Kvaliteten verificeres med en testsuite
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\section{EP-05}
+\begin{frame}{EP-05 Dokumentation og aflevering}{Et komplet repository, der kan forstås og køres uden mundtlig forklaring}
+  \begin{columns}[T]
+    \column{0.44\textwidth}
+    \textbf{Features}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item F-05.1 Afleveringsdokumentation
+    \end{itemize}
+    \vspace{0.4em}
+    {\footnotesize\color{muted}Forretningsværdi: bedømmer og ny udvikler kan gå fra kode til kørende program.}
+    \column{0.54\textwidth}
+    \textbf{User Stories}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item[\done] US-13 Projektet kan afleveres komplet på GitHub
+    \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Sammenfatning}
+  \begin{columns}[T]
+    \column{0.48\textwidth}
+    \textbf{Leveret}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item Datagrundlag, parsing og berigelse
+      \item Tabelvisning og navigation
+      \item Analyse, diagrammer og flagging
+      \item Fejlhåndtering og modulær struktur
+      \item Dokumentation og aflevering
+    \end{itemize}
+    \column{0.48\textwidth}
+    \textbf{Resterende i sprinten}
+    \vspace{0.3em}
+    \begin{itemize}
+      \item[\open] F-04.3 Test og validering
+    \end{itemize}
+    \vspace{0.2em}
+    {\footnotesize\color{muted}pytest-suite og coverage på parser og analyse.}
+  \end{columns}
+  \vfill
+  \centering
+  {\small\color{muted}5 epics \quad$\cdot$\quad 12 features \quad$\cdot$\quad 12 af 13 user stories afsluttet}
+\end{frame}
+
+\end{document}
