@@ -14,6 +14,13 @@ def test_load_log_file_returns_raw_lines(small_log_path: Path, small_log_lines: 
     assert lines == small_log_lines
     assert all(isinstance(line, str) for line in lines)
 
+    # Samme som dette, måske lettere at læse:
+    # all_strings = True
+    # for line in lines:
+    #     if not isinstance(line, str):
+    #         all_strings = False
+    # assert all_strings
+
 
 # Stien må også gives som str og ikke kun Path.
 def test_load_log_file_accepts_string_path(small_log_path: Path, small_log_lines: list[str]):

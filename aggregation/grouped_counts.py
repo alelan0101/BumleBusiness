@@ -59,3 +59,11 @@ def _group_rows( counts_by_value, key: str, format_value: Callable[[object], str
         {key: format_value(value), **counts_by_value[value]}
         for value in sorted(counts_by_value)
     ]
+
+# Samme som dette, måske lettere at læse:
+# def _group_rows(counts_by_value, key, format_value=str):
+#     result = []
+#     for value in sorted(counts_by_value):
+#         row = {key: format_value(value), **counts_by_value[value]}
+#         result.append(row)
+#     return result

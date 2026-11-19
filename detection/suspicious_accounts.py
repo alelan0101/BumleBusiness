@@ -33,6 +33,12 @@ def track_suspicious_accounts( records: Iterable[LogRecord], rules: Mapping[str,
             for event, threshold in detection_rules.items()
             if internal_event_counts[user][event] >= threshold
         }
+
+        # Samme som dette, måske lettere at læse:
+        # triggered_rules = {}
+        # for event, threshold in detection_rules.items():
+        #     if internal_event_counts[user][event] >= threshold:
+        #         triggered_rules[event] = internal_event_counts[user][event]
         if not triggered_rules:
             continue
 
@@ -44,6 +50,17 @@ def track_suspicious_accounts( records: Iterable[LogRecord], rules: Mapping[str,
             and record.ip_scope == "intern"
             and record.event in triggered_rules
         )
+
+        # Samme som dette, måske lettere at læse:
+        # entry_index = None
+        # for index, record in enumerate(ordered_records):
+        #     if (
+        #         record.user == user
+        #         and record.ip_scope == "intern"
+        #         and record.event in triggered_rules
+        #     ):
+        #         entry_index = index
+        #         break
         entry = ordered_records[entry_index]
 
         # Find næste sted samme IP dukkede op, men på en anden vært eller port.
@@ -58,6 +75,16 @@ def track_suspicious_accounts( records: Iterable[LogRecord], rules: Mapping[str,
             ),
             None,
         )
+
+        # Samme som dette, måske lettere at læse:
+        # next_record = None
+        # for record in ordered_records[entry_index + 1 :]:
+        #     if record.src_ip == entry.src_ip and (
+        #         (record.dest_host, record.dest_port)
+        #         != (entry.dest_host, entry.dest_port)
+        #     ):
+        #         next_record = record
+        #         break
         # Teksten viser hvad der skete, hvilken IP der var involveret, og hvor IP'en gik hen bagefter
         entry_location = f"{entry.event} at {entry.dest_host}:{entry.dest_port}"
         next_location = (

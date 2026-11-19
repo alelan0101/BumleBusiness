@@ -209,6 +209,13 @@ def parse_dot(text):
             "kind": parts[-1] if len(parts) > 2 else "module",
         }
     modules = {n["group"]: n["label"].strip('"') for n in nodes.values() if n["module"]}
+
+    # Samme som dette, måske lettere at læse:
+    # modules = {}
+    # for n in nodes.values():
+    #     if n["module"]:
+    #         modules[n["group"]] = n["label"].strip('"')
+
     return nodes, edges, modules
 
 
@@ -241,19 +248,50 @@ def view_nodes(view, nodes, edges, modules):
             keep.add(start)
         if view.get("skip_names", True):
             keep = {name for name in keep if not nodes[name]["kind"].startswith("name in ")}
+
+            # Samme som dette, måske lettere at læse:
+            # filtered = set()
+            # for name in keep:
+            #     if not nodes[name]["kind"].startswith("name in "):
+            #         filtered.add(name)
+            # keep = filtered
+
         return keep, [e for e in edges if e["src"] in keep and e["dst"] in keep]
+
+        # Samme som dette, måske lettere at læse:
+        # kept_edges = []
+        # for e in edges:
+        #     if e["src"] in keep and e["dst"] in keep:
+        #         kept_edges.append(e)
+        # return keep, kept_edges
     return set(), []
 
 
 def module_graph(nodes, edges, modules):
     names = sorted(modules.values())
     colors = {name: PALETTE[i % len(PALETTE)] for i, name in enumerate(names)}
+
+    # Samme som dette, måske lettere at læse:
+    # colors = {}
+    # for i, name in enumerate(names):
+    #     colors[name] = PALETTE[i % len(PALETTE)]
+
     node_map = {name: {
         "id": name,
         "label": f'"{name}"',
         "tooltip": f'"{name}"',
         "module": name,
     } for name in names}
+
+    # Samme som dette, måske lettere at læse:
+    # node_map = {}
+    # for name in names:
+    #     node_map[name] = {
+    #         "id": name,
+    #         "label": f'"{name}"',
+    #         "tooltip": f'"{name}"',
+    #         "module": name,
+    #     }
     pairs = set()
     for edge in edges:
         src = modules.get(nodes.get(edge["src"], {}).get("group"))
@@ -261,6 +299,11 @@ def module_graph(nodes, edges, modules):
         if src and dst and src != dst:
             pairs.add((src, dst))
     edge_list = [{"src": a, "dst": b, "dashed": False} for a, b in sorted(pairs)]
+
+    # Samme som dette, måske lettere at læse:
+    # edge_list = []
+    # for a, b in sorted(pairs):
+    #     edge_list.append({"src": a, "dst": b, "dashed": False})
     return node_map, edge_list, colors
 
 
@@ -314,6 +357,11 @@ def build():
     module_colors = {name: PALETTE[i % len(PALETTE)]
                      for i, name in enumerate(sorted(modules.values()))}
 
+    # Samme som dette, måske lettere at læse:
+    # module_colors = {}
+    # for i, name in enumerate(sorted(modules.values())):
+    #     module_colors[name] = PALETTE[i % len(PALETTE)]
+
     sections = []
     for view in VIEWS:
         if view["kind"] == "modules":
@@ -322,6 +370,15 @@ def build():
             keep, edge_list = view_nodes(view, nodes, edges, modules)
             node_map = {name: {**nodes[name], "module": node_module(nodes[name], modules)}
                         for name in nodes if name in keep}
+
+            # Samme som dette, måske lettere at læse:
+            # node_map = {}
+            # for name in nodes:
+            #     if name in keep:
+            #         node_map[name] = {
+            #             **nodes[name],
+            #             "module": node_module(nodes[name], modules),
+            #         }
             colors = module_colors
         svg = to_svg(to_dot(node_map, edge_list, colors, view["rankdir"]))
         sections.append(f"""
@@ -335,12 +392,31 @@ def build():
             v["id"], ' class="active"' if i == 0 else "", v["title"])
         for i, v in enumerate(VIEWS)
     )
+
+    # Samme som dette, måske lettere at læse:
+    # buttons = []
+    # for i, v in enumerate(VIEWS):
+    #     buttons.append(
+    #         '      <button data-view="%s"%s>%s</button>' % (
+    #             v["id"], ' class="active"' if i == 0 else "", v["title"])
+    #     )
+    # tabs = "\n".join(buttons)
     chips = "\n".join(
         f'      <button class="chip" data-class="m{re.sub(r"[^0-9a-zA-Z_]", "_", name)}">'
         f'<span style="background:{module_colors[name][1]}"></span>'
         f'{html.escape(name)}</button>'
         for name in sorted(module_colors)
     )
+
+    # Samme som dette, måske lettere at læse:
+    # buttons = []
+    # for name in sorted(module_colors):
+    #     buttons.append(
+    #         f'      <button class="chip" data-class="m{re.sub(r"[^0-9a-zA-Z_]", "_", name)}">'
+    #         f'<span style="background:{module_colors[name][1]}"></span>'
+    #         f'{html.escape(name)}</button>'
+    #     )
+    # chips = "\n".join(buttons)
 
     page = Template(TEMPLATE.read_text(encoding="utf-8")).substitute(
         tabs=tabs,

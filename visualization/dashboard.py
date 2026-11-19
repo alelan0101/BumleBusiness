@@ -39,6 +39,26 @@ def create_app(records) -> Dash:
         for attribute in logview.FILTER_ATTRIBUTES
     ]
 
+    # Samme som dette, måske lettere at læse:
+    # filter_dropdowns = []
+    # for attribute in logview.FILTER_ATTRIBUTES:
+    #     options = []
+    #     for value in logview.filter_options(records, attribute):
+    #         options.append({"label": value, "value": value})
+    #     filter_dropdowns.append(
+    #         html.Div(
+    #             [
+    #                 html.Label(tables.COLUMN_LABELS[attribute]),
+    #                 dcc.Dropdown(
+    #                     id=f"{attribute}-filter",
+    #                     options=options,
+    #                     placeholder="Alle",
+    #                     clearable=True,
+    #                 ),
+    #             ]
+    #         )
+    #     )
+
     # Fritekstsøgning, der kun ser på besked-kolonnen
     msg_filter = html.Div(
         [
@@ -51,6 +71,13 @@ def create_app(records) -> Dash:
             ),
         ]
     )
+
+    # Samme som dette, måske lettere at læse:
+    # column_options = []
+    # for column in columns:
+    #     column_options.append(
+    #         {"label": tables.COLUMN_LABELS[column], "value": column}
+    #     )
 
     # To dropdowns: hvilken kolonne der sorteres efter, og om det er stigende eller faldende
     sort_controls = [
@@ -114,6 +141,12 @@ def create_app(records) -> Dash:
     summary = user_ips.get_user_ip_summary(records)
     ips_per_user = summary["ips_per_user"]
     ip_counts = [str(count) for count in ips_per_user.values()]
+
+    # Samme som dette, måske lettere at læse:
+    # ip_counts = []
+    # for count in ips_per_user.values():
+    #     ip_counts.append(str(count))
+
     first, last = analysis.time_range(records)
     failures, total = analysis.failure_counts(records)
     failure_text = (
@@ -197,6 +230,26 @@ def create_app(records) -> Dash:
     # Tallene til fane 6: fejlandel pr. port, både for alle og for eksterne IP'er
     port_rows = analysis.port_failure_rows(records)
 
+    # Samme som dette, måske lettere at læse:
+    # port_labels = []
+    # event_labels = []
+    # failure_labels = []
+    # rate_labels = []
+    # external_labels = []
+    # external_rate_labels = []
+    # for row in port_rows:
+    #     port_labels.append(str(row["port"]))
+    #     event_labels.append(str(row["total"]))
+    #     failure_labels.append(str(row["failures"]))
+    #     rate_labels.append(f"{row['failure_rate'] * 100:.1f} %")
+    #     external_labels.append(str(row["external"]))
+    #     if row["external"]:
+    #         external_rate_labels.append(
+    #             f"{row['external_failure_rate'] * 100:.1f} %"
+    #         )
+    #     else:
+    #         external_rate_labels.append("-")
+
     # Fane 6: fejlandel pr. port som tabel
     port_tab = dcc.Tab(
         label="Fejlandel pr. port",
@@ -234,6 +287,17 @@ def create_app(records) -> Dash:
 
     # Tallene til fane 7: de ti hyppigste brugere, kilde-IP'er og destinationer
     top_lists = analysis.top_n_lists(records)
+
+    # Samme som dette, måske lettere at læse:
+    # top_tables = []
+    # for entries, value_label in (
+    #     (top_lists["users"], "Bruger"),
+    #     (top_lists["src_ips"], "Kilde-IP"),
+    #     (top_lists["dest_hosts"], "Destination"),
+    # ):
+    #     top_tables.append(
+    #         dcc.Graph(figure=tables.build_top_n_table(entries, value_label))
+    #     )
 
     # Fane 7: top 10 som tre små tabeller ved siden af hinanden
     top_tab = dcc.Tab(

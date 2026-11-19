@@ -66,6 +66,12 @@ def top_n_lists( records: Iterable[LogRecord], n: int = TOP_N) -> dict[str, list
 def _rank_rows(rows, key, n):
     entries = [(row[key], row["Events"]) for row in rows if key in row]
 
+    # Samme som dette, måske lettere at læse:
+    # entries = []
+    # for row in rows:
+    #     if key in row:
+    #         entries.append((row[key], row["Events"]))
+
     return sorted(entries, key=lambda item: (-item[1], item[0]))[:n]
 
 
@@ -79,6 +85,11 @@ def is_failure(record: LogRecord) -> bool:
 def time_range( records: Iterable[LogRecord], ) -> tuple[datetime | None, datetime | None]:
     timestamps = [record.timestamp for record in records]
 
+    # Samme som dette, måske lettere at læse:
+    # timestamps = []
+    # for record in records:
+    #     timestamps.append(record.timestamp)
+
     if not timestamps:
         return None, None
 
@@ -91,6 +102,12 @@ def failure_counts(records: Iterable[LogRecord]) -> tuple[int, int]:
     records = list(records)
     failures = sum(1 for record in records if is_failure(record))
 
+    # Samme som dette, måske lettere at læse:
+    # failures = 0
+    # for record in records:
+    #     if is_failure(record):
+    #         failures += 1
+
     return failures, len(records)
 
 
@@ -99,6 +116,15 @@ def hourly_event_counts(records: Iterable[LogRecord]) -> list[tuple[int, int]]:
     counts = Counter(record.hour for record in records)
 
     return [(hour, counts[hour]) for hour in range(24)]
+
+    # Samme som dette, måske lettere at læse:
+    # counts = Counter()
+    # for record in records:
+    #     counts[record.hour] += 1
+    # hours = []
+    # for hour in range(24):
+    #     hours.append((hour, counts[hour]))
+    # return hours
 
 
 # Regner fejlraten ud pr. bruger: antal fejl divideret med antal events.
@@ -123,6 +149,18 @@ def user_failure_rates(records: Iterable[LogRecord]) -> list[UserFailure]:
         for user, total in totals.items()
     ]
 
+    # Samme som dette, måske lettere at læse:
+    # rates: list[UserFailure] = []
+    # for user, total in totals.items():
+    #     rates.append(
+    #         {
+    #             "user": user,
+    #             "failures": failures[user],
+    #             "total": total,
+    #             "rate": failures[user] / total,
+    #         }
+    #     )
+
     return sorted(rates, key=lambda entry: (-entry["rate"], entry["user"]))
 
 
@@ -132,6 +170,13 @@ def port_event_series(records: Iterable[LogRecord]) -> list[PortEvent]:
         (record.dest_port, record.event_category, record.ip_scope)
         for record in records
     )
+
+    # Samme som dette, måske lettere at læse:
+    # counts = Counter()
+    # for record in records:
+    #     key = (record.dest_port, record.event_category, record.ip_scope)
+    #     counts[key] += 1
+
     series: list[PortEvent] = [
         {
             "port": port,
@@ -141,6 +186,18 @@ def port_event_series(records: Iterable[LogRecord]) -> list[PortEvent]:
         }
         for (port, category, scope), count in counts.items()
     ]
+
+    # Samme som dette, måske lettere at læse:
+    # series: list[PortEvent] = []
+    # for (port, category, scope), count in counts.items():
+    #     series.append(
+    #         {
+    #             "port": port,
+    #             "event_category": category,
+    #             "ip_scope": scope,
+    #             "count": count,
+    #         }
+    #     )
     return sorted(
         series,
         key=lambda entry: (
@@ -156,6 +213,12 @@ def hourly_summary(records: Iterable[LogRecord]) -> HourlySummary:
     hourly = hourly_event_counts(records)
 
     # Hvis alle 24 timer har nul events, er der intet at opsummere
+    # Samme som dette, måske lettere at læse:
+    # has_events = False
+    # for _, count in hourly:
+    #     if count:
+    #         has_events = True
+    # if not has_events:
     if not any(count for _, count in hourly):
         return {
             "average": 0.0,
@@ -169,6 +232,11 @@ def hourly_summary(records: Iterable[LogRecord]) -> HourlySummary:
     busiest_hour, busiest_count = max(hourly, key=lambda item: item[1])
     quietest_hour, quietest_count = min(hourly, key=lambda item: item[1])
     total = sum(count for _, count in hourly)
+
+    # Samme som dette, måske lettere at læse:
+    # total = 0
+    # for _, count in hourly:
+    #     total += count
 
     return {
         "average": total / len(hourly),
@@ -196,6 +264,25 @@ def port_failure_rows(records: Iterable[LogRecord]) -> list[PortFailure]:
             external_failures[port] += is_failure(record)
 
     # Byg rækkerne i portnummerets rækkefølge, så tabellen bliver let at læse
+    # Samme som dette, måske lettere at læse:
+    # rows = []
+    # for port in sorted(totals):
+    #     rows.append(
+    #         {
+    #             "port": port,
+    #             "total": totals[port],
+    #             "failures": failures[port],
+    #             "failure_rate": failures[port] / totals[port],
+    #             "external": external[port],
+    #             "external_failure_rate": (
+    #                 external_failures[port] / external[port]
+    #                 if external[port]
+    #                 else 0.0
+    #             ),
+    #         }
+    #     )
+    # return rows
+
     return [
         {
             "port": port,

@@ -90,6 +90,13 @@ def test_skipped_lines_are_returned_unchanged(edge_case_lines: list[str]):
     assert skipped_lines == edge_case_lines[2:]
     assert all(isinstance(line, str) for line in skipped_lines)
 
+    # Samme som dette, måske lettere at læse:
+    # all_strings = True
+    # for line in skipped_lines:
+    #     if not isinstance(line, str):
+    #         all_strings = False
+    # assert all_strings
+
 
 # Hver enkelt fejltype afvises isoleret: manglende felt, ugyldig port,
 # manglende msg og ugyldigt timestamp.

@@ -74,6 +74,14 @@ def cell_fill(records, column):
         for record in records
     ]
 
+    # Samme som dette, måske lettere at læse:
+    # colors = []
+    # for record in records:
+    #     colors.append(
+    #         CELL_COLORS.get(format_cell(record, column), NEUTRAL_CELL_COLOR)
+    #     )
+    # return colors
+
 
 # Bygger logtabellen: en kolonne pr. felt og en række pr. record.
 def build_table(records, columns=DEFAULT_COLUMNS):
@@ -81,7 +89,29 @@ def build_table(records, columns=DEFAULT_COLUMNS):
         [format_cell(record, column) for record in records]
         for column in columns
     ]
+
+    # Samme som dette, måske lettere at læse:
+    # cells = []
+    # for column in columns:
+    #     column_cells = []
+    #     for record in records:
+    #         column_cells.append(format_cell(record, column))
+    #     cells.append(column_cells)
+
     fills = [cell_fill(records, column) for column in columns]
+
+    # Samme som dette, måske lettere at læse:
+    # fills = []
+    # for column in columns:
+    #     fills.append(cell_fill(records, column))
+
+    # Samme som dette, måske lettere at læse:
+    # columnwidths = []
+    # for column in columns:
+    #     columnwidths.append(COLUMN_WIDTHS[column])
+    # header_values = []
+    # for column in columns:
+    #     header_values.append(COLUMN_LABELS[column])
 
     figure = go.Figure(
         data=[
@@ -121,6 +151,11 @@ def build_columns_table(headers, columns):
         ]
     )
     rows = max((len(column) for column in columns), default=0)
+
+    # Samme som dette, måske lettere at læse:
+    # rows = 0
+    # for column in columns:
+    #     rows = max(rows, len(column))
     height = HEADER_HEIGHT + ROW_HEIGHT * max(rows, 1)
     height += MARGIN["t"] + MARGIN["b"]
     figure.update_layout(margin=MARGIN, height=height)
@@ -136,6 +171,15 @@ def build_top_n_table(entries, value_label, count_label="Events"):
             [count for _, count in entries],
         ),
     )
+
+    # Samme som dette, måske lettere at læse:
+    # values = []
+    # for value, _ in entries:
+    #     values.append(value)
+    # counts = []
+    # for _, count in entries:
+    #     counts.append(count)
+    # return build_columns_table((value_label, count_label), (values, counts))
 
 
 # Tabel uden rækker og med en tekst om at filtrene ikke matcher noget

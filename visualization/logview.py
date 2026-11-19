@@ -41,6 +41,12 @@ def filter_records(records, event=None, user=None, level=None, dest_host=None, d
     }
     active = [(key, value) for key, value in selected.items() if value]
 
+    # Samme som dette, måske lettere at læse:
+    # active = []
+    # for key, value in selected.items():
+    #     if value:
+    #         active.append((key, value))
+
     # Søgeteksten gøres lowercase, så søgningen ikke er afhængig af store og små bogstaver
     pattern = msg.strip().lower() if msg else ""
 
@@ -52,10 +58,26 @@ def filter_records(records, event=None, user=None, level=None, dest_host=None, d
         and pattern in record.msg.lower()
     ]
 
+    # Samme som dette, måske lettere at læse:
+    # matched = []
+    # for record in records:
+    #     matches = True
+    #     for key, value in active:
+    #         if str(getattr(record, key)) != value:
+    #             matches = False
+    #     if matches and pattern in record.msg.lower():
+    #         matched.append(record)
+    # return matched
+
 
 # Alle forskellige værdier i en kolonne, sorteret. Tal sorteres som tal, så 80 kommer før 443 og ikke efter.
 def filter_options(records, attribute) -> list[str]:
     values = {str(getattr(record, attribute)) for record in records}
+
+    # Samme som dette, måske lettere at læse:
+    # values = set()
+    # for record in records:
+    #     values.add(str(getattr(record, attribute)))
     return sorted(
         values,
         key=lambda value: (0, int(value)) if value.isdigit() else (1, value),

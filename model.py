@@ -41,6 +41,13 @@ def classify_ip(address: str) -> str:
     # En rigtig IPv4-adresse har præcis fire tal, hver mellem 0 og 255
     if len(octets) != 4:
         return "invalid"
+    # Samme som dette, måske lettere at læse:
+    # invalid = False
+    # for octet in octets:
+    #     if not (octet.isdigit() and 0 <= int(octet) <= 255):
+    #         invalid = True
+    # if invalid:
+    #     return "invalid"
     if not all(octet.isdigit() and 0 <= int(octet) <= 255 for octet in octets):
         return "invalid"
 

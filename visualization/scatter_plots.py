@@ -52,6 +52,15 @@ def hour_event_scatter(records):
         return _empty_figure(title, "Time på dagen", "Antal events")
 
     series = analysis.hourly_event_counts(records)
+
+    # Samme som dette, måske lettere at læse:
+    # hours = []
+    # for hour, _ in series:
+    #     hours.append(hour)
+    # counts = []
+    # for _, count in series:
+    #     counts.append(count)
+
     figure = go.Figure(
         go.Scatter(
             x=[hour for hour, _ in series],
@@ -87,6 +96,22 @@ def user_failure_scatter(records):
     total_failures = sum(entry["failures"] for entry in series)
     total_events = sum(entry["total"] for entry in series)
     overall_rate = total_failures / total_events * 100 if total_events else 0
+
+    # Samme som dette, måske lettere at læse:
+    # total_failures = 0
+    # total_events = 0
+    # for entry in series:
+    #     total_failures += entry["failures"]
+    #     total_events += entry["total"]
+
+    # Samme som dette, måske lettere at læse:
+    # users = []
+    # rates = []
+    # points = []
+    # for entry in series:
+    #     users.append(entry["user"])
+    #     rates.append(entry["rate"] * 100)
+    #     points.append([entry["failures"], entry["total"]])
 
     figure = go.Figure(
         go.Scatter(
@@ -127,15 +152,56 @@ def port_event_scatter(records):
         return _empty_figure(title, "Destinationsport", "Eventtype")
 
     series = analysis.port_event_series(records)
+
+    # Samme som dette, måske lettere at læse:
+    # ports = set()
+    # for entry in series:
+    #     ports.add(entry["port"])
+    # ports = sorted(ports)
+
     ports = sorted({entry["port"] for entry in series})
     labels = [f"{port} ({service_name(port)})" for port in ports]
+
+    # Samme som dette, måske lettere at læse:
+    # labels = []
+    # for port in ports:
+    #     labels.append(f"{port} ({service_name(port)})")
+
     label_by_port = dict(zip(ports, labels))
     max_count = max(entry["count"] for entry in series)
 
+    # Samme som dette, måske lettere at læse:
+    # max_count = 0
+    # for entry in series:
+    #     max_count = max(max_count, entry["count"])
+
     # En trace pr. IP-klasse, så de får hver sin farve i legend'en
+    # Samme som dette, måske lettere at læse:
+    # scopes = set()
+    # for entry in series:
+    #     scopes.add(entry["ip_scope"])
+    # for scope in sorted(scopes):
     figure = go.Figure()
     for scope in sorted({entry["ip_scope"] for entry in series}):
         entries = [entry for entry in series if entry["ip_scope"] == scope]
+
+        # Samme som dette, måske lettere at læse:
+        # entries = []
+        # for entry in series:
+        #     if entry["ip_scope"] == scope:
+        #         entries.append(entry)
+
+        # Samme som dette, måske lettere at læse:
+        # x_values = []
+        # y_values = []
+        # sizes = []
+        # points = []
+        # for entry in entries:
+        #     x_values.append(label_by_port[entry["port"]])
+        #     y_values.append(CATEGORY_LABELS[entry["event_category"]])
+        #     sizes.append(entry["count"])
+        #     points.append([entry["count"], entry["ip_scope"]])
+
         figure.add_trace(
             go.Scatter(
                 x=[label_by_port[entry["port"]] for entry in entries],
@@ -162,6 +228,11 @@ def port_event_scatter(records):
                 name=scope,
             )
         )
+
+    # Samme som dette, måske lettere at læse:
+    # category_labels = []
+    # for category in CATEGORY_ORDER:
+    #     category_labels.append(CATEGORY_LABELS[category])
 
     return _layout(
         figure,

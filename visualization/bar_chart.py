@@ -28,11 +28,21 @@ def _empty_figure() -> go.Figure:
 def event_bar_chart(records) -> go.Figure:
     counts = Counter(record.event for record in records)
 
+    # Samme som dette, måske lettere at læse:
+    # counts = Counter()
+    # for record in records:
+    #     counts[record.event] += 1
+
     if not counts:
         return _empty_figure()
 
     events = sorted(counts, key=lambda event: (-counts[event], event))
     values = [counts[event] for event in events]
+
+    # Samme som dette, måske lettere at læse:
+    # values = []
+    # for event in events:
+    #     values.append(counts[event])
 
     figure = go.Figure(
         go.Bar(
